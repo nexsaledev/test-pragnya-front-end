@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="images/logo.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Pragnya Young Orators Tournament Schedule, Results, and Philosophy."/>
+  <title>Tournaments – Pragnya Young Orators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--forest:#2d5a3a;--deep:#1e3a28;--gold:#c9a84c;--gold-lt:#e0c06a;--cream:#f7f4ee;--white:#ffffff;--text:#1a2e1f;--muted:#5a7264;--border:#e0dbd0;--sidebar-w:230px;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;color:var(--text);background:var(--white);display:flex;}
+    .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--cream);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:200;padding:28px 0 20px;overflow-y:auto;transition:transform .3s ease;}
+    .sidebar-logo{padding:0 24px 24px;border-bottom:1px solid var(--border);}
+    .logo-mark{width:54px;height:54px;border-radius:50%;overflow:hidden;margin-bottom:10px;display:block;}
+    .logo-mark img{width:54px;height:54px;border-radius:50%;object-fit:cover;display:block;}
+    .logo-name{font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--deep);line-height:1.3;}
+    .logo-tagline{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+    .sidebar nav{padding:12px 0;flex:1;}
+    .nav-group{display:block;}
+    .nav-item{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:inherit;}
+    .nav-item:hover{background:#ede9e0;color:var(--forest);}
+    .nav-item.active{background:#ede9e0;color:var(--forest);border-left:3px solid var(--gold);padding-left:21px;}
+    .nav-label{text-decoration:none;color:inherit;flex:1;pointer-events:auto;}
+    .nav-arrow{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;flex-shrink:0;transition:transform .25s ease;color:var(--muted);}
+    .nav-toggle.open .nav-arrow{transform:rotate(90deg);}
+    .nav-sub{max-height:0;overflow:hidden;transition:max-height .3s ease;background:rgba(30,58,40,.04);}
+    .nav-sub.open{max-height:200px;}
+    .nav-sub a{display:block;padding:7px 24px 7px 38px;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s,background .15s;}
+    .nav-sub a:hover{color:var(--forest);background:#ede9e0;}
+    .sidebar-ctas{padding:16px 20px 0;display:flex;flex-direction:column;gap:10px;}
+    .btn-primary{display:block;text-align:center;background:var(--gold);color:var(--deep);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:12px 16px;border-radius:4px;text-decoration:none;}
+    .btn-primary:hover{background:var(--gold-lt);}
+    .btn-outline{display:block;text-align:center;border:1.5px solid var(--text);color:var(--text);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 16px;border-radius:4px;text-decoration:none;}
+    .btn-outline:hover{border-color:var(--forest);color:var(--forest);}
+    .sidebar-footer{padding:20px 24px 0;border-top:1px solid var(--border);margin-top:auto;}
+    .sidebar-footer a{display:block;font-size:12px;color:var(--muted);text-decoration:none;line-height:2.1;}
+    .sidebar-footer a:hover{color:var(--forest);}
+    .sidebar-footer .footer-note{font-size:11px;color:var(--muted);margin-top:4px;}
+    .mobile-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:300;height:56px;background:var(--deep);align-items:center;justify-content:space-between;padding:0 20px;}
+    .mobile-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .mobile-logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
+    .mobile-logo-name{font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;line-height:1.3;}
+    .hamburger{background:none;border:none;cursor:pointer;padding:6px;display:flex;flex-direction:column;gap:5px;}
+    .hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .3s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;}
+    .sidebar-overlay.open{display:block;}
+    main{margin-left:var(--sidebar-w);flex:1;}
+    .page-hero{background:var(--deep);padding:72px 56px 64px;position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:340px;height:340px;border-radius:50%;background:rgba(201,168,76,.07);}
+    .page-hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .page-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3rem);color:#fff;line-height:1.15;max-width:600px;}
+    .page-hero p{font-size:.97rem;color:rgba(255,255,255,.72);margin-top:14px;max-width:520px;line-height:1.7;}
+    .stats-band{background:var(--forest);padding:60px 56px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;}
+    .stat-num{font-family:'DM Serif Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
+    .stat-label{font-size:.78rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:8px;}
+    .section-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .section-divider{width:44px;height:3px;background:var(--gold);margin:14px 0 32px;}
+    /* PHILOSOPHY */
+    .philosophy-section{padding:80px 56px;background:var(--cream);}
+    .pathway-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px;}
+    .pathway-card{background:var(--white);border-radius:4px;padding:28px;border-top:4px solid var(--gold);}
+    .pathway-level{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .pathway-card h3{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--deep);margin-bottom:10px;}
+    .pathway-card p{font-size:.85rem;color:var(--muted);line-height:1.65;}
+    /* CALENDAR TABLE */
+    .calendar-section{padding:80px 56px;background:var(--white);}
+    .calendar-table-wrap{overflow-x:auto;margin-top:0;}
+    .calendar-table{width:100%;border-collapse:collapse;}
+    .calendar-table th{text-align:left;padding:10px 16px;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--cream);border-bottom:2px solid var(--border);}
+    .calendar-table td{padding:14px 16px;font-size:.88rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .calendar-table tr:hover td{background:rgba(247,244,238,.6);}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+    .badge-person{background:rgba(45,90,58,.1);color:var(--forest);}
+    .badge-online{background:rgba(201,168,76,.15);color:#8a6b1a;}
+    /* USA FORENSICS */
+    .forensics-section{padding:56px 56px;background:var(--cream);}
+    .forensics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;}
+    .forensics-card{background:var(--white);border-radius:4px;padding:20px;border-left:3px solid var(--gold);}
+    .forensics-card h3{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--deep);margin-bottom:4px;}
+    .forensics-card p{font-size:.82rem;color:var(--muted);}
+    /* EVENTS */
+    .events-section{padding:80px 56px;background:var(--white);}
+    .events-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px;}
+    .event-card{border:1px solid var(--border);border-radius:6px;padding:24px;}
+    .event-icon{width:44px;height:44px;background:rgba(201,168,76,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+    .event-card h3{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--deep);margin-bottom:8px;}
+    .event-card p{font-size:.84rem;color:var(--muted);line-height:1.6;}
+    /* RESULTS */
+    .results-section{padding:80px 56px;background:var(--cream);}
+    .results-table{width:100%;border-collapse:collapse;}
+    .results-table th{text-align:left;padding:10px 16px;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--white);border-bottom:2px solid var(--border);}
+    .results-table td{padding:14px 16px;font-size:.88rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .results-table tr:hover td{background:rgba(247,244,238,.4);}
+    .badge-gold{background:rgba(201,168,76,.15);color:#8a6b1a;}
+    .badge-silver{background:rgba(100,116,139,.12);color:#475569;}
+    .badge-national{background:rgba(45,90,58,.12);color:var(--forest);}
+    .badge-qualifier{background:rgba(30,58,40,.08);color:var(--muted);}
+    /* CTA */
+    .cta-band{background:var(--gold);padding:60px 56px;display:flex;align-items:center;justify-content:space-between;gap:32px;}
+    .cta-band h2{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--deep);}
+    .cta-band p{font-size:.93rem;color:rgba(30,58,40,.72);margin-top:6px;}
+    .cta-btns{display:flex;gap:14px;flex-shrink:0;}
+    .cta-btn-dark{background:var(--deep);color:#fff;padding:14px 28px;border-radius:4px;font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;}
+    .cta-btn-dark:hover{background:var(--forest);}
+    .cta-btn-light{background:transparent;color:var(--deep);padding:13px 28px;border-radius:4px;font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:2px solid var(--deep);}
+    footer{background:var(--deep);color:rgba(255,255,255,.55);padding:48px 56px 32px;}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:36px;}
+    .footer-brand-col .footer-brand{font-family:'DM Serif Display',serif;font-size:1.2rem;color:#fff;display:block;margin-bottom:10px;}
+    .footer-brand-col p{font-size:.82rem;line-height:1.7;color:rgba(255,255,255,.5);max-width:240px;margin-bottom:16px;}
+    .footer-social{display:flex;gap:10px;}
+    .footer-social a{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);text-decoration:none;transition:background .2s;}
+    .footer-social a:hover{background:var(--gold);color:var(--deep);}
+    .footer-col h4{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+    .footer-col a{display:block;font-size:.82rem;color:rgba(255,255,255,.5);text-decoration:none;line-height:2.2;}
+    .footer-col a:hover{color:#fff;}
+    .footer-col p{font-size:.82rem;color:rgba(255,255,255,.5);line-height:2.0;}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;}
+    .footer-bottom a{color:var(--gold);text-decoration:none;}
+    .footer-quote{font-style:italic;color:rgba(255,255,255,.4);}
+    @media(max-width:900px){
+      .mobile-bar{display:flex;} .sidebar{transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,.2);}
+      .sidebar.open{transform:translateX(0);} main{margin-left:0!important;padding-top:56px;}
+      .stats-band{grid-template-columns:repeat(2,1fr);} .pathway-grid{grid-template-columns:1fr;}
+      .events-grid{grid-template-columns:1fr;} .forensics-grid{grid-template-columns:1fr 1fr;}
+      .cta-band{flex-direction:column;text-align:center;}
+      .footer-grid{grid-template-columns:1fr 1fr;} .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+      .calendar-table{font-size:.82rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-bar">
+    <a class="mobile-logo" href="index.html"><img src="images/logo.png" alt="Pragnya Young Orators"/><span class="mobile-logo-name">Pragnya<br>Young Orators</span></a>
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  </div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><img src="images/logo.png" alt="Pragnya Young Orators logo"/></div>
+      <div class="logo-name">Pragnya<br>Young Orators</div>
+      <div class="logo-tagline">Find Your Voice</div>
+    </div>
+    <nav>
+      <a class="nav-item" href="index.html">Home</a>
+      <a class="nav-item" href="about.html">About Us</a>
+      <a class="nav-item" href="programs.html">Programs</a>
+      <a class="nav-item active" href="tournaments.html">Tournaments</a>
+      <div class="nav-group">
+        <button class="nav-item nav-toggle" onclick="navToggle(this)">
+          <a class="nav-label" href="gallery.html">Gallery</a>
+          <span class="nav-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 3l4 3-4 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+        <div class="nav-sub"><a href="gallery.html">All Photos</a><a href="gallery.html#achievements">Achievements</a><a href="gallery.html#speech">Speech</a><a href="gallery.html#camp">Camp</a></div>
+      </div>
+      <a class="nav-item" href="join.html">Join Us</a>
+    </nav>
+    <div class="sidebar-ctas">
+      <a class="btn-primary" href="join.html">Join Us &rsaquo;</a>
+      <a class="btn-outline" href="programs.html">View Programs &rsaquo;</a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="mailto:pragnyaevents@gmail.com">pragnyaevents@gmail.com</a>
+      <div class="footer-note">Est. 2020 &middot; San Diego, CA</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <main>
+    <section class="page-hero">
+      <p class="page-hero-eyebrow">Tournaments</p>
+      <h1>Compete. Grow.<br>Champion.</h1>
+      <p>PYO tournaments focus on confidence, communication, resilience, leadership, growth, and competitive excellence. From local invitationals to national championships — your journey starts here.</p>
+    </section>
+
+    <section class="stats-band">
+      <div><div class="stat-num">30+</div><div class="stat-label">Awards Won</div></div>
+      <div><div class="stat-num">18+</div><div class="stat-label">Tournaments</div></div>
+      <div><div class="stat-num">3</div><div class="stat-label">National Appearances</div></div>
+      <div><div class="stat-num">200+</div><div class="stat-label">Rounds Competed</div></div>
+    </section>
+
+    <!-- PHILOSOPHY + PATHWAY -->
+    <section class="philosophy-section" id="philosophy">
+      <p class="section-label">Tournament Philosophy</p>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--deep);">Our competitive pathway</h2>
+      <div class="section-divider"></div>
+      <p style="font-size:.95rem;line-height:1.8;color:#3a5244;max-width:700px;margin-bottom:32px;">PYO tournaments focus on confidence, communication, resilience, leadership, growth, and competitive excellence. Every student competes at their own level and advances when ready.</p>
+      <div class="pathway-grid">
+        <div class="pathway-card">
+          <p class="pathway-level">Beginner Level</p>
+          <h3>Local &amp; Introductory</h3>
+          <p>Local invitationals and introductory showcases. Perfect for first-time competitors building confidence and experience.</p>
+        </div>
+        <div class="pathway-card">
+          <p class="pathway-level">Intermediate Level</p>
+          <h3>Regional Competitions</h3>
+          <p>Regional competitions and structured debates. Students face stronger competition and develop competitive strategies.</p>
+        </div>
+        <div class="pathway-card">
+          <p class="pathway-level">Advanced Level</p>
+          <h3>National Championships</h3>
+          <p>National qualifiers and championship tournaments including ASDA Nationals, NSDA, and USA Forensics Olympiad.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FULL TOURNAMENT CALENDAR -->
+    <section class="calendar-section" id="schedule">
+      <p class="section-label">Competition Calendar</p>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--deep);">Full Tournament Calendar</h2>
+      <div class="section-divider"></div>
+      <div class="calendar-table-wrap">
+        <table class="calendar-table">
+          <thead>
+            <tr>
+              <th>Tournament</th>
+              <th>Date</th>
+              <th>Format</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>CSU Long Beach</strong></td><td>September</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>Chuck Ballingall Memorial Invitational</strong></td><td>Sept 25</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>CSU Fullerton</strong></td><td>October</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>UCLA Invitational</strong></td><td>Oct 17–18</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>Harvard Debate UKTOC ISDI 1</strong></td><td>Oct 23–25</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>Quarry Lane</strong></td><td>Oct 31 – Nov 1</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>SDSU Gaske Memorial</strong></td><td>November</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>John Lewis SVUDL Invitational</strong></td><td>Nov 20–22</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>La Costa Canyon – Carlsbad</strong></td><td>December</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>NOF Ruby Invitational</strong></td><td>December</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>Harvard Debate UKTOC ISDI 3</strong></td><td>Jan 22–24</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>ASDA San Diego National Qualifier</strong></td><td>Jan 27</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>UC Berkeley Invitational</strong></td><td>Feb 13–15</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>Ryan Mills SVUDL</strong></td><td>Feb 20–21</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>Rotary Tournament</strong></td><td>February</td><td><span class="badge badge-person">In Person</span></td></tr>
+            <tr><td><strong>ASDA Series</strong></td><td>Feb / Mar / Apr</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>LMLA</strong></td><td>April</td><td><span class="badge badge-online">Online</span></td></tr>
+            <tr><td><strong>ASDA Nationals</strong></td><td>May</td><td><span class="badge badge-person">In Person</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- USA FORENSICS OLYMPIAD -->
+    <section class="forensics-section">
+      <p class="section-label">USA Forensics Olympiad</p>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--deep);">Olympiad Calendar</h2>
+      <div class="section-divider"></div>
+      <div class="forensics-grid">
+        <div class="forensics-card"><h3>Summer Cup</h3><p>Date: TBD</p></div>
+        <div class="forensics-card"><h3>Fall Cup</h3><p>Date: Oct 16–18</p></div>
+        <div class="forensics-card"><h3>Winter Cup</h3><p>Date: TBD</p></div>
+        <div class="forensics-card"><h3>National Cup</h3><p>Date: Apr 23–25</p></div>
+      </div>
+    </section>
+
+    <!-- EVENTS EXPLAINED -->
+    <section class="events-section" id="events">
+      <p class="section-label">Events Explained</p>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--deep);">Competition events we compete in</h2>
+      <div class="section-divider"></div>
+      <div class="events-grid">
+        <div class="event-card"><div class="event-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v16M4 8l7-5 7 5" stroke="#c9a84c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Original Oratory</h3><p>A prepared speech on a topic of the student's choice. Tests research, writing, and delivery skills.</p></div>
+        <div class="event-card"><div class="event-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11h14M11 4v14" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#c9a84c" stroke-width="1.6"/></svg></div><h3>Impromptu</h3><p>Speak on a randomly assigned topic with minimal preparation. Tests quick thinking and adaptability.</p></div>
+        <div class="event-card"><div class="event-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="16" rx="2" stroke="#c9a84c" stroke-width="1.6"/><rect x="12" y="3" width="7" height="16" rx="2" stroke="#c9a84c" stroke-width="1.6"/></svg></div><h3>Debate</h3><p>Structured argumentation on a resolution. Students argue both sides, developing logic and persuasion.</p></div>
+        <div class="event-card"><div class="event-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 8h14M4 14h14" stroke="#c9a84c" stroke-width="1.6" stroke-linecap="round"/></svg></div><h3>SPAR</h3><p>Spontaneous Argumentation — fast-paced debate with a partner on random topics. A crowd favorite.</p></div>
+        <div class="event-card"><div class="event-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 6h14M4 11h14M4 16h9" stroke="#c9a84c" stroke-width="1.6" stroke-linecap="round"/></svg></div><h3>Declamation</h3><p>Deliver a famous historical speech with your own interpretation, expression, and stage presence.</p></div>
+        <div class="event-card"><div class="event-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#c9a84c" stroke-width="1.6"/><path d="M8 9l3 2 3-2M8 13h6" stroke="#c9a84c" stroke-width="1.4" stroke-linecap="round"/></svg></div><h3>Interpretation</h3><p>Bring a piece of literature to life through expressive, dramatic oral reading and performance.</p></div>
+      </div>
+    </section>
+
+    <!-- RESULTS TABLE -->
+    <section class="results-section" id="results">
+      <p class="section-label">Competition History</p>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--deep);">Results &amp; Placements</h2>
+      <div class="section-divider"></div>
+      <div style="overflow-x:auto;">
+        <table class="results-table">
+          <thead>
+            <tr><th>Tournament</th><th>Event</th><th>Level</th><th>Result</th><th>Year</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>ASDA Nationals</strong></td><td>Impromptu Speaking</td><td><span class="badge badge-national">National</span></td><td><span class="badge badge-gold">Award Winner</span></td><td>2024</td></tr>
+            <tr><td><strong>ASDA Nationals</strong></td><td>Original Oratory</td><td><span class="badge badge-national">National</span></td><td><span class="badge badge-gold">Finalist</span></td><td>2024</td></tr>
+            <tr><td><strong>NSDA Division 1</strong></td><td>Winter Tournament</td><td><span class="badge badge-national">National</span></td><td><span class="badge badge-gold">Trophy Winner</span></td><td>2024</td></tr>
+            <tr><td><strong>Rotary Club – Rancho Bernardo Sunrise</strong></td><td>Youth Speech</td><td><span class="badge badge-qualifier">Regional</span></td><td><span class="badge badge-silver">Participant</span></td><td>2024</td></tr>
+            <tr><td><strong>Optimist International</strong></td><td>Oratorical Contest</td><td><span class="badge badge-qualifier">Regional</span></td><td><span class="badge badge-gold">Finalist</span></td><td>2024</td></tr>
+            <tr><td><strong>ASDA Qualifier</strong></td><td>Extemporaneous Speaking</td><td><span class="badge badge-qualifier">Qualifier</span></td><td><span class="badge badge-gold">Qualified – Nationals</span></td><td>2023</td></tr>
+            <tr><td><strong>Middle School – Del Norte</strong></td><td>Invitational</td><td><span class="badge badge-qualifier">Local</span></td><td><span class="badge badge-gold">Award Winner</span></td><td>2023</td></tr>
+            <tr><td><strong>ASDA</strong></td><td>Original Oratory</td><td><span class="badge badge-qualifier">Regional</span></td><td><span class="badge badge-gold">Award Winner</span></td><td>2022</td></tr>
+            <tr><td><strong>ASDA</strong></td><td>Impromptu</td><td><span class="badge badge-qualifier">Regional</span></td><td><span class="badge badge-silver">Finalist</span></td><td>2022</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div>
+        <h2>Ready to compete?</h2>
+        <p>Your child could be our next national champion. Join PYO today.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn-dark" href="join.html">Join Us</a>
+        <a class="cta-btn-light" href="programs.html">View Programs</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <span class="footer-brand">Pragnya Young Orators</span>
+          <p>Helping students discover confidence, leadership, and their voice. Est. 2020 &middot; San Diego, CA</p>
+          <div class="footer-social">
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Quick Links</h4><a href="index.html">Home</a><a href="programs.html">Programs</a><a href="tournaments.html">Tournaments</a><a href="join.html">Join Us</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="about.html">About Us</a><a href="gallery.html">Gallery</a><a href="tournaments.html#results">Results</a><a href="tournaments.html#schedule">Schedule</a></div>
+        <div class="footer-col"><h4>Contact</h4><a href="mailto:pragnyaevents@gmail.com">pragnyaevents@gmail.com</a><p>(619) 555-0190</p><p>San Diego, CA</p></div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Pragnya Young Orators</span>
+        <span class="footer-quote">Helping students discover confidence, leadership, and their voice.</span>
+        <a href="login.html">Portal Login</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); var h=document.getElementById('hamburger'); if(h) h.classList.remove('open'); }
+    function navToggle(btn) { btn.classList.toggle('open'); var sub=btn.nextElementSibling; if(sub&&sub.classList.contains('nav-sub')) sub.classList.toggle('open'); }
+    document.querySelectorAll('.nav-sub a, a.nav-item').forEach(function(a){ a.addEventListener('click', function(){ if(window.innerWidth<=900) closeSidebar(); }); });
+  </script>
+</body>
+</html>

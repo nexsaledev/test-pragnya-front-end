@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="images/logo.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Pragnya Young Orators – Student-led speech and debate academy focused on confidence, communication, leadership, and competitive excellence."/>
+  <title>Pragnya Young Orators – From Shy Beginners to National Champions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest: #2d5a3a; --deep: #1e3a28; --gold: #c9a84c; --gold-lt: #e0c06a;
+      --cream: #f7f4ee; --white: #ffffff; --text: #1a2e1f; --muted: #5a7264;
+      --border: #e0dbd0; --sidebar-w: 230px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--white); display: flex; }
+
+    /* ── ANNOUNCEMENT BANNER ── */
+    .announcement-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      background: var(--gold); color: var(--deep);
+      text-align: center; padding: 9px 48px 9px 16px;
+      font-size: .82rem; font-weight: 600; line-height: 1.4;
+    }
+    .announcement-banner a { color: var(--deep); text-decoration: underline; }
+    .banner-close {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; font-size: 1.1rem;
+      color: var(--deep); line-height: 1; padding: 4px;
+    }
+    body.banner-visible { padding-top: 38px; }
+    body.banner-visible .sidebar { top: 38px; }
+    body.banner-visible .mobile-bar { top: 38px; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+  width: var(--sidebar-w); min-height: 100vh; background: var(--cream);
+  border-right: 1px solid var(--border); display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; z-index: 200; padding: 28px 0 32px;
+  overflow-y: auto; transition: transform .3s ease;
+}
+    .sidebar-logo { padding: 0 24px 24px; border-bottom: 1px solid var(--border); }
+    .logo-mark { width: 54px; height: 54px; border-radius: 50%; overflow: hidden; margin-bottom: 10px; display: block; }
+    .logo-mark img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; display: block; }
+    .logo-name { font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--deep); line-height: 1.3; }
+    .logo-tagline { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+    .sidebar nav { padding: 12px 0; flex: 1; }
+    .nav-group { display: block; }
+    .nav-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 24px; font-size: 13px; font-weight: 500; color: var(--text);
+      text-decoration: none; transition: background .15s, color .15s;
+      border: none; background: none; width: 100%; text-align: left; cursor: pointer;
+      font-family: inherit;
+    }
+    .nav-item:hover { background: #ede9e0; color: var(--forest); }
+    .nav-item.active { background: #ede9e0; color: var(--forest); border-left: 3px solid var(--gold); padding-left: 21px; }
+    .nav-label { text-decoration: none; color: inherit; flex: 1; pointer-events: auto; }
+    .nav-arrow {
+      display: flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0;
+      transition: transform .25s ease; color: var(--muted);
+    }
+    .nav-toggle.open .nav-arrow { transform: rotate(90deg); }
+    .nav-item:hover .nav-arrow { background: rgba(45,90,58,.1); }
+    .nav-sub { max-height: 0; overflow: hidden; transition: max-height .3s ease; background: rgba(30,58,40,.04); }
+    .nav-sub.open { max-height: 200px; }
+    .nav-sub a { display: block; padding: 7px 24px 7px 38px; font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; transition: color .15s, background .15s; }
+    .nav-sub a:hover { color: var(--forest); background: #ede9e0; }
+    .sidebar-ctas { padding: 16px 20px 0; display: flex; flex-direction: column; gap: 10px; }
+    .btn-primary { display: block; text-align: center; background: var(--gold); color: var(--deep); font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 12px 16px; border-radius: 4px; text-decoration: none; }
+    .btn-primary:hover { background: var(--gold-lt); }
+    .btn-outline { display: block; text-align: center; border: 1.5px solid var(--text); color: var(--text); font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 11px 16px; border-radius: 4px; text-decoration: none; }
+    .btn-outline:hover { border-color: var(--forest); color: var(--forest); }
+    .sidebar-footer { padding: 20px 24px 16px; border-top: 1px solid var(--border); margin-top: auto; }
+    .sidebar-footer a { display: block; font-size: 12px; color: var(--muted); text-decoration: none; line-height: 2.1; }
+    .sidebar-footer a:hover { color: var(--forest); }
+    .sidebar-footer .footer-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── MOBILE TOP BAR ── */
+    .mobile-bar {
+      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      height: 56px; background: var(--deep);
+      align-items: center; justify-content: space-between; padding: 0 20px;
+    }
+    .mobile-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .mobile-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .mobile-logo-name { font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--white); line-height: 1.3; }
+    .hamburger { background: none; border: none; cursor: pointer; padding: 6px; display: flex; flex-direction: column; gap: 5px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all .3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 199; }
+    .sidebar-overlay.open { display: block; }
+
+    main { margin-left: var(--sidebar-w); flex: 1; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 76vh; display: flex; align-items: stretch;
+      overflow: hidden; background: var(--deep);
+    }
+    .hero-left {
+      flex: 0 0 38%; display: flex; align-items: center;
+      background: var(--deep); padding: 72px 40px 72px 56px;
+      position: relative; z-index: 2;
+    }
+    .hero-left::after {
+      content: ''; position: absolute; top: 0; right: -32px; bottom: 0; width: 32px;
+      background: linear-gradient(to right, var(--deep), transparent); z-index: 3;
+    }
+    .hero-right { flex: 0 0 62%; position: relative; overflow: hidden; background: var(--deep); }
+    .hero-right img { width: 100%; height: 100%; object-fit: contain; object-position: center center; display: block; filter: brightness(.9) saturate(1.05); }
+    .hero-right::before {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to right, var(--deep) 0%, rgba(30,58,40,.15) 6%, transparent 18%);
+    }
+    .hero-content { width: 100%; }
+    .hero-eyebrow {
+      display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--gold); border: 1px solid rgba(201,168,76,.45); padding: 5px 14px; border-radius: 20px; margin-bottom: 24px;
+    }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 3.2vw, 3.4rem); line-height: 1.1; color: var(--white); }
+    .hero h1 .accent { color: var(--gold); font-style: italic; }
+    .hero-sub { font-size: .97rem; color: rgba(255,255,255,.78); line-height: 1.65; max-width: 400px; margin-top: 20px; }
+    .hero-btns { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+    .hero-btn-primary { background: var(--gold); color: var(--deep); padding: 13px 24px; border-radius: 4px; font-weight: 700; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+    .hero-btn-primary:hover { background: var(--gold-lt); }
+    .hero-btn-outline { background: transparent; color: var(--white); padding: 12px 24px; border-radius: 4px; font-weight: 700; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border: 2px solid rgba(255,255,255,.45); }
+    .hero-btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── WHAT IS PYO ── */
+    .what-pyo { background: var(--cream); padding: 84px 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .intro-label { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .what-pyo h2 { font-family: 'DM Serif Display', serif; font-size: 2.25rem; line-height: 1.2; color: var(--forest); }
+    .intro-divider { width: 44px; height: 3px; background: var(--gold); margin: 18px 0; }
+    .what-pyo p { font-size: .97rem; line-height: 1.78; color: #3a5244; }
+    .intro-img { position: relative; max-width: 380px; margin: 0 auto; }
+    .intro-img img { width: 100%; max-height: 320px; object-fit: cover; object-position: top; border-radius: 4px; display: block; box-shadow: 0 12px 40px rgba(30,58,40,.18); }
+    .intro-badge {
+      position: absolute; bottom: -18px; left: -18px; background: var(--forest); color: var(--white);
+      padding: 14px 20px; border-radius: 4px; font-weight: 700; font-size: .95rem; line-height: 1.3;
+      box-shadow: 0 8px 24px rgba(30,58,40,.3);
+    }
+    .intro-badge span { color: var(--gold); }
+
+    /* ── WHY PARENTS CHOOSE US ── */
+    .why-section { padding: 88px 56px; background: var(--white); }
+    .section-header { margin-bottom: 44px; }
+    .section-header .label { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .section-header h2 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--deep); }
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .why-card { border: 1px solid var(--border); border-radius: 6px; padding: 28px; transition: box-shadow .2s, transform .2s; }
+    .why-card:hover { box-shadow: 0 8px 28px rgba(30,58,40,.1); transform: translateY(-3px); }
+    .why-card-icon { width: 44px; height: 44px; background: rgba(201,168,76,.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .why-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--deep); margin-bottom: 8px; }
+    .why-card p { font-size: .86rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── PROGRAMS OVERVIEW ── */
+    .programs-strip { padding: 88px 56px; background: var(--cream); }
+    .programs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .prog-card { border: 1px solid #e5e0d6; border-radius: 6px; overflow: hidden; transition: transform .2s, box-shadow .2s; background: var(--white); }
+    .prog-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(30,58,40,.12); }
+    .prog-card-img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .prog-card-body { padding: 24px; }
+    .prog-card-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .prog-card-body h3 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; color: var(--deep); margin-bottom: 10px; }
+    .prog-card-body p { font-size: .87rem; line-height: 1.65; color: var(--muted); }
+    .prog-price { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--forest); margin: 10px 0 4px; }
+    .prog-price-label { font-size: .76rem; color: var(--muted); }
+    .prog-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+      font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--forest); text-decoration: none; border-bottom: 2px solid var(--gold); padding-bottom: 2px;
+    }
+    .prog-link:hover { color: var(--gold); }
+
+    /* ── IMPACT ── */
+    .impact { background: var(--forest); padding: 76px 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
+    .stat-num { font-family: 'DM Serif Display', serif; font-size: 3rem; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: .8rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.72); margin-top: 8px; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section { padding: 88px 56px; background: var(--white); }
+    .testi-carousel { position: relative; overflow: hidden; margin-top: 40px; }
+    .testi-track { display: flex; transition: transform .4s ease; }
+    .testi-slide { min-width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testi-card { border: 1px solid var(--border); border-radius: 6px; padding: 28px; position: relative; background: var(--cream); }
+    .testi-card::before { content: '\201C'; font-family: 'DM Serif Display', serif; font-size: 4rem; color: var(--gold); opacity: .3; position: absolute; top: 10px; left: 20px; line-height: 1; }
+    .testi-text { font-size: .93rem; line-height: 1.7; color: var(--text); margin-bottom: 18px; padding-top: 24px; font-style: italic; }
+    .testi-cite { font-size: .8rem; font-weight: 700; color: var(--forest); letter-spacing: .06em; text-transform: uppercase; }
+    .testi-controls { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+    .testi-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); border: none; cursor: pointer; transition: background .2s; }
+    .testi-dot.active { background: var(--gold); }
+
+    /* ── UPCOMING TOURNAMENTS ── */
+    .tournaments-preview { padding: 88px 56px; background: var(--cream); }
+    .tournament-mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
+    .tournament-mini-card { background: var(--white); border-radius: 4px; padding: 20px; border-left: 4px solid var(--gold); }
+    .t-date { font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+    .t-name { font-weight: 700; font-size: .92rem; color: var(--deep); margin-bottom: 4px; }
+    .t-format { font-size: .8rem; color: var(--muted); }
+    .view-all-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 28px; font-size: .82rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--forest); text-decoration: none; border-bottom: 2px solid var(--gold); padding-bottom: 2px; }
+
+    /* ── CTA BAND ── */
+    .cta-band { background: var(--gold); padding: 60px 56px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+    .cta-band h2 { font-family: 'DM Serif Display', serif; font-size: 1.9rem; color: var(--deep); }
+    .cta-band p { font-size: .93rem; color: rgba(30,58,40,.72); margin-top: 6px; }
+    .cta-btns { display: flex; gap: 14px; flex-shrink: 0; }
+    .cta-btn-dark { background: var(--deep); color: var(--white); padding: 14px 28px; border-radius: 4px; font-weight: 700; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+    .cta-btn-dark:hover { background: var(--forest); }
+    .cta-btn-light { background: transparent; color: var(--deep); padding: 13px 28px; border-radius: 4px; font-weight: 700; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border: 2px solid var(--deep); }
+    .cta-btn-light:hover { background: rgba(30,58,40,.1); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--deep); color: rgba(255,255,255,.55); padding: 48px 56px 32px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 36px; }
+    .footer-brand-col .footer-brand { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--white); display: block; margin-bottom: 10px; }
+    .footer-brand-col p { font-size: .82rem; line-height: 1.7; color: rgba(255,255,255,.5); max-width: 240px; margin-bottom: 16px; }
+    .footer-social { display: flex; gap: 10px; }
+    .footer-social a { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.6); text-decoration: none; transition: background .2s; }
+    .footer-social a:hover { background: var(--gold); color: var(--deep); }
+    .footer-col h4 { font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .footer-col a { display: block; font-size: .82rem; color: rgba(255,255,255,.5); text-decoration: none; line-height: 2.2; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-col p { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 2.0; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: .78rem; }
+    .footer-bottom a { color: var(--gold); text-decoration: none; }
+    .footer-quote { font-style: italic; color: rgba(255,255,255,.4); }
+
+    /* ── IMAGE ZOOM + LIGHTBOX ── */
+    .img-zoom { overflow: hidden; border-radius: 4px; cursor: zoom-in; display: block; position: relative; }
+    .img-zoom img { transition: transform .4s ease, filter .4s ease; display: block; width: 100%; }
+    .img-zoom:hover img { transform: scale(1.06); filter: brightness(1.05); }
+    .img-zoom::after { content: ''; position: absolute; inset: 0; background: rgba(30,58,40,0); transition: background .3s; border-radius: 4px; pointer-events: none; }
+    .img-zoom:hover::after { background: rgba(30,58,40,.12); }
+    .img-zoom::before { content: ''; position: absolute; top: 10px; right: 10px; z-index: 2; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.0) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.35-4.35M11 8v6M8 11h6'/%3E%3C/svg%3E") center/16px no-repeat; opacity: 0; transform: scale(.7); transition: opacity .25s, transform .25s, background .25s; }
+    .img-zoom:hover::before { opacity: 1; transform: scale(1); background-color: rgba(30,58,40,.65); }
+    #glb { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(10,20,14,.94); align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
+    #glb.open { display: flex; }
+    #glb-wrap { position: relative; max-width: 92vw; max-height: 92vh; display: flex; flex-direction: column; align-items: center; }
+    #glb img { max-width: 90vw; max-height: 85vh; border-radius: 6px; object-fit: contain; display: block; box-shadow: 0 24px 80px rgba(0,0,0,.6); animation: glbIn .22s ease; }
+    @keyframes glbIn { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }
+    #glb-caption { color: rgba(255,255,255,.65); font-size: .82rem; margin-top: 12px; font-family: 'Inter', sans-serif; text-align: center; letter-spacing: .04em; }
+    #glb-close { position: fixed; top: 18px; right: 22px; color: white; font-size: 2rem; cursor: pointer; background: none; border: none; opacity: .7; transition: opacity .2s; line-height: 1; z-index: 10000; }
+    #glb-close:hover { opacity: 1; }
+    #glb-prev, #glb-next { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.12); color: white; border: none; font-size: 1.6rem; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: background .2s; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+    #glb-prev { left: 16px; }
+    #glb-next { right: 16px; }
+    #glb-prev:hover, #glb-next:hover { background: rgba(255,255,255,.25); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .mobile-bar { display: flex; }
+      .sidebar { transform: translateX(-100%); box-shadow: 4px 0 24px rgba(0,0,0,.2); }
+      .sidebar.open { transform: translateX(0); }
+      main { margin-left: 0 !important; padding-top: 56px; }
+      .hero { flex-direction: column; min-height: auto; }
+      .hero-left { flex: none; width: 100%; padding: 48px 24px; }
+      .hero-left::after { display: none; }
+      .hero-right { flex: none; width: 100%; min-height: 260px; }
+      .what-pyo, .programs-grid, .why-grid { grid-template-columns: 1fr; gap: 40px; }
+      .impact { grid-template-columns: repeat(2, 1fr); }
+      .testi-slide { grid-template-columns: 1fr; }
+      .tournament-mini-grid { grid-template-columns: 1fr; }
+      .cta-band { flex-direction: column; text-align: center; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+      .hero-btns { flex-direction: column; }
+    }
+    @media (max-width: 500px) {
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="banner-visible">
+
+  <!-- ANNOUNCEMENT BANNER -->
+  <div class="announcement-banner" id="announcementBanner">
+    🏆 ASDA Nationals Registration Open — <a href="tournaments.html">View Tournament Schedule</a> &nbsp;|&nbsp; Summer Enrollment Now Open — <a href="join.html">Join Us</a>
+    <button class="banner-close" onclick="closeBanner()" aria-label="Close">&times;</button>
+  </div>
+
+  <!-- MOBILE TOP BAR -->
+  <div class="mobile-bar">
+    <a class="mobile-logo" href="index.html">
+      <img src="images/logo.png" alt="Pragnya Young Orators"/>
+      <span class="mobile-logo-name">Pragnya<br>Young Orators</span>
+    </a>
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><img src="images/logo.png" alt="Pragnya Young Orators logo"/></div>
+      <div class="logo-name">Pragnya<br>Young Orators</div>
+      <div class="logo-tagline">Find Your Voice</div>
+    </div>
+    <nav>
+      <a class="nav-item active" href="index.html">Home</a>
+      <a class="nav-item" href="about.html">About Us</a>
+      <a class="nav-item" href="programs.html">Programs</a>
+      <a class="nav-item" href="tournaments.html">Tournaments</a>
+      <div class="nav-group">
+        <button class="nav-item nav-toggle" onclick="navToggle(this)">
+          <a class="nav-label" href="gallery.html">Gallery</a>
+          <span class="nav-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 3l4 3-4 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+        <div class="nav-sub">
+          <a href="gallery.html">All Photos</a>
+          <a href="gallery.html#achievements">Achievements</a>
+          <a href="gallery.html#speech">Speech</a>
+          <a href="gallery.html#camp">Camp</a>
+        </div>
+      </div>
+      <a class="nav-item" href="join.html">Join Us</a>
+    </nav>
+    <div class="sidebar-ctas">
+      <a class="btn-primary" href="join.html">Join Us &rsaquo;</a>
+      <a class="btn-outline" href="programs.html">View Programs &rsaquo;</a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="mailto:pragnyaevents@gmail.com">pragnyaevents@gmail.com</a>
+      <div class="footer-note">Est. 2020 &middot; San Diego, CA</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-content">
+          <span class="hero-eyebrow">Speech &amp; Debate Academy &middot; Est. 2020</span>
+          <h1>
+            Empowering Young<br>
+            Speakers <span class="accent">Into</span><br>
+            <span class="accent">Confident Leaders</span>
+          </h1>
+          <p class="hero-sub">Student-led speech and debate academy focused on confidence, communication, leadership, and competitive excellence.</p>
+          <div class="hero-btns">
+            <a class="hero-btn-primary" href="programs.html">Explore Programs</a>
+            <a class="hero-btn-outline" href="join.html">Join Us</a>
+            <a class="hero-btn-outline" href="tournaments.html">Tournament Journey</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <span class="img-zoom" data-caption="Pragnya students at debate tournament"><img src="Camp/e4e9f6f71_3a07ab72-7093-4a9b-aff3-b47791776ea1.jpeg" alt="Pragnya students at debate tournament"/></span>
+      </div>
+    </section>
+
+    <!-- WHAT IS PYO -->
+    <section class="what-pyo" id="about">
+      <div>
+        <p class="intro-label">Discover Your Voice at PYO</p>
+        <h2>Speaking can make all the difference.</h2>
+        <div class="intro-divider"></div>
+        <p>Pragnya Young Orators helps students build confidence, communication, leadership, public speaking, and debate skills through structured coaching, mentorship, and tournament experiences.</p>
+        <p style="margin-top:14px;font-size:.97rem;line-height:1.78;color:#3a5244;">From shy beginners to national champions — every student at PYO gets the tools, support, and stage time to discover their unique voice and grow into a confident leader.</p>
+      </div>
+      <div class="intro-img">
+        <span class="img-zoom" data-caption="Students holding award certificates"><img src="Speech/61b9698b6_bad4882c-d29f-461e-8e68-8a58dfc16501.jpeg" alt="Students holding award certificates"/></span>
+        <div class="intro-badge">200+ students<br><span>inspired &amp; counting</span></div>
+      </div>
+    </section>
+
+    <!-- WHY PARENTS CHOOSE US -->
+    <section class="why-section">
+      <div class="section-header">
+        <p class="label">Why Families Choose PYO</p>
+        <h2>6 reasons parents love us</h2>
+      </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#c9a84c" stroke-width="1.6"/><path d="M8 11l2 2 4-4" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Confidence Building</h3>
+          <p>Helping students overcome stage fear and speak confidently in front of any audience.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v16M4 8l7-5 7 5" stroke="#c9a84c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Public Speaking Excellence</h3>
+          <p>Strong communication and presentation development for school, competitions, and life.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2l2.2 6.6H20l-5.6 4 2.1 6.4L11 16l-5.5 4 2.1-6.4L2 9.6h6.8z" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+          <h3>Leadership Development</h3>
+          <p>Helping students grow into leaders and mentors within their schools and communities.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11h14M11 4v14" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#c9a84c" stroke-width="1.6"/></svg></div>
+          <h3>Debate &amp; Critical Thinking</h3>
+          <p>Teaching structured thinking and persuasive argumentation through competitive debate formats.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2a4 4 0 100 8 4 4 0 000-8zM5 18a6 6 0 0112 0" stroke="#c9a84c" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>Tournament Opportunities</h3>
+          <p>Exposure to local and national competitions — ASDA, NSDA, Rotary, Optimist, and more.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 17s-7-4.5-7-9a7 7 0 1114 0c0 4.5-7 9-7 9z" stroke="#c9a84c" stroke-width="1.6"/></svg></div>
+          <h3>Supportive Community</h3>
+          <p>Encouraging student-led collaborative learning in a warm, inclusive, culturally rich environment.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRAMS OVERVIEW -->
+    <section class="programs-strip" id="programs">
+      <div class="section-header">
+        <p class="label">Our Programs</p>
+        <h2>Choose your journey</h2>
+      </div>
+      <div class="programs-grid">
+        <div class="prog-card">
+          <span class="img-zoom" data-caption="Beginners Program"><img class="prog-card-img" src="Camp/e4e9f6f71_3a07ab72-7093-4a9b-aff3-b47791776ea1.jpeg" alt="Beginners Program"/></span>
+          <div class="prog-card-body">
+            <p class="prog-card-tag">Grades 5–7 &middot; Beginners</p>
+            <h3>Beginners Program</h3>
+            <p>Confidence &bull; Fundamentals &bull; Stage Presence. Weekly sessions, tournament guidance, and practice resources.</p>
+            <div class="prog-price">$200<span style="font-size:.9rem;color:var(--muted)">/year</span></div>
+            <a class="prog-link" href="programs.html#beginners">Learn More &rarr;</a>
+          </div>
+        </div>
+        <div class="prog-card">
+          <span class="img-zoom" data-caption="Junior Varsity Program"><img class="prog-card-img" src="Camp/7bc5f1c8a_CB51B011-B079-4F28-A56A-D6ACD34E952C.jpeg" alt="Junior Varsity Program"/></span>
+          <div class="prog-card-body">
+            <p class="prog-card-tag">Junior Varsity &middot; Saturdays</p>
+            <h3>Junior Varsity Program</h3>
+            <p>Speech Events &bull; SPAR &bull; Intro Debate. Tournament readiness, interpretation, and structured practice.</p>
+            <div class="prog-price">$250<span style="font-size:.9rem;color:var(--muted)">/year</span></div>
+            <a class="prog-link" href="programs.html#jv">Learn More &rarr;</a>
+          </div>
+        </div>
+        <div class="prog-card">
+          <span class="img-zoom" data-caption="Varsity Program"><img class="prog-card-img" src="Camp/acd8bd1a2_2c9e28c8-1f19-4051-bd97-e25157b723a6.jpeg" alt="Varsity Program"/></span>
+          <div class="prog-card-body">
+            <p class="prog-card-tag">Varsity &middot; Sundays</p>
+            <h3>Varsity Program</h3>
+            <p>Advanced Speech &amp; Debate &bull; Leadership &bull; National Preparation. Mentorship and championship tournament prep.</p>
+            <div class="prog-price">$350<span style="font-size:.9rem;color:var(--muted)">/year</span></div>
+            <a class="prog-link" href="programs.html#varsity">Learn More &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPACT STATS -->
+    <section class="impact">
+      <div><div class="stat-num">200+</div><div class="stat-label">Students Inspired</div></div>
+      <div><div class="stat-num">30+</div><div class="stat-label">Awards Won</div></div>
+      <div><div class="stat-num">15+</div><div class="stat-label">Programs Offered</div></div>
+      <div><div class="stat-num">3+</div><div class="stat-label">Years Growing</div></div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials-section">
+      <div class="section-header">
+        <p class="label">Parent &amp; Student Voices</p>
+        <h2>What families say about PYO</h2>
+      </div>
+      <div class="testi-carousel">
+        <div class="testi-track" id="testiTrack">
+          <div class="testi-slide">
+            <div class="testi-card">
+              <p class="testi-text">"PYO helped my child become more confident and expressive both inside and outside the classroom."</p>
+              <span class="testi-cite">— Parent, Oratory Club</span>
+            </div>
+            <div class="testi-card">
+              <p class="testi-text">"The supportive environment and tournament experience transformed my child's communication skills."</p>
+              <span class="testi-cite">— Parent, Summer Camp</span>
+            </div>
+            <div class="testi-card">
+              <p class="testi-text">"From being nervous to competing confidently at tournaments, the growth has been incredible."</p>
+              <span class="testi-cite">— Parent, 2024</span>
+            </div>
+          </div>
+          <div class="testi-slide">
+            <div class="testi-card">
+              <p class="testi-text">"My child went from barely speaking in class to competing at ASDA Nationals. Pragnya made that happen."</p>
+              <span class="testi-cite">— Parent, Varsity</span>
+            </div>
+            <div class="testi-card">
+              <p class="testi-text">"The coaches genuinely care about each student. The mentorship goes far beyond just speech practice."</p>
+              <span class="testi-cite">— Parent, JV Program</span>
+            </div>
+            <div class="testi-card">
+              <p class="testi-text">"Joining Pragnya was one of the best decisions we made. My son leads with confidence now."</p>
+              <span class="testi-cite">— Parent, 2025</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-controls">
+          <button class="testi-dot active" onclick="goSlide(0)"></button>
+          <button class="testi-dot" onclick="goSlide(1)"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPCOMING TOURNAMENTS -->
+    <section class="tournaments-preview">
+      <div class="section-header">
+        <p class="label">Competition Calendar</p>
+        <h2>Upcoming tournaments</h2>
+      </div>
+      <div class="tournament-mini-grid">
+        <div class="tournament-mini-card"><p class="t-date">September</p><p class="t-name">CSU Long Beach</p><p class="t-format">In Person</p></div>
+        <div class="tournament-mini-card"><p class="t-date">Sept 25</p><p class="t-name">Chuck Ballingall Memorial Invitational</p><p class="t-format">In Person</p></div>
+        <div class="tournament-mini-card"><p class="t-date">Oct 17–18</p><p class="t-name">UCLA Invitational</p><p class="t-format">Online</p></div>
+        <div class="tournament-mini-card"><p class="t-date">Oct 23–25</p><p class="t-name">Harvard Debate UKTOC ISDI 1</p><p class="t-format">Online</p></div>
+        <div class="tournament-mini-card"><p class="t-date">Jan 27</p><p class="t-name">ASDA San Diego National Qualifier</p><p class="t-format">In Person</p></div>
+        <div class="tournament-mini-card"><p class="t-date">May</p><p class="t-name">ASDA Nationals</p><p class="t-format">In Person</p></div>
+      </div>
+      <a class="view-all-link" href="tournaments.html">View Full Tournament Calendar &rarr;</a>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="cta-band" id="enroll">
+      <div>
+        <h2>Help Your Child Find Their Voice</h2>
+        <p>Join a community where every student is seen, heard, and celebrated.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn-dark" href="programs.html">Explore Programs</a>
+        <a class="cta-btn-light" href="join.html">Join Us</a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <span class="footer-brand">Pragnya Young Orators</span>
+          <p>Helping students discover confidence, leadership, and their voice. Est. 2020 &middot; San Diego, CA</p>
+          <div class="footer-social">
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <a href="index.html">Home</a>
+          <a href="programs.html">Programs</a>
+          <a href="tournaments.html">Tournaments</a>
+          <a href="join.html">Join Us</a>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <a href="about.html">About Us</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="tournaments.html#results">Results</a>
+          <a href="tournaments.html#schedule">Schedule</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <a href="mailto:pragnyaevents@gmail.com">pragnyaevents@gmail.com</a>
+          <p>San Diego, CA</p>
+          <p style="margin-top:8px;font-style:italic;font-size:.78rem;color:rgba(255,255,255,.35);">Speech &amp; Debate Academy</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Pragnya Young Orators</span>
+        <span class="footer-quote">Helping students discover confidence, leadership, and their voice.</span>
+        <a href="login.html">Portal Login</a>
+      </div>
+    </footer>
+  </main>
+
+  <!-- GLOBAL LIGHTBOX -->
+  <div id="glb" onclick="glbClose(event)">
+    <button id="glb-close" onclick="glbClose()">&times;</button>
+    <button id="glb-prev" onclick="glbNav(-1,event)">&#8249;</button>
+    <button id="glb-next" onclick="glbNav(1,event)">&#8250;</button>
+    <div id="glb-wrap"><img id="glb-img" src="" alt=""/><p id="glb-caption"></p></div>
+  </div>
+
+  <script>
+    // Banner
+    function closeBanner() {
+      document.getElementById('announcementBanner').style.display='none';
+      document.body.classList.remove('banner-visible');
+    }
+
+    // Sidebar
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('open');
+      document.getElementById('hamburger').classList.toggle('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+      var h = document.getElementById('hamburger');
+      if(h) h.classList.remove('open');
+    }
+    function navToggle(btn) {
+      btn.classList.toggle('open');
+      var sub = btn.nextElementSibling;
+      if(sub && sub.classList.contains('nav-sub')) sub.classList.toggle('open');
+    }
+    document.querySelectorAll('.nav-sub a, a.nav-item').forEach(function(a){
+      a.addEventListener('click', function(){ if(window.innerWidth<=900) closeSidebar(); });
+    });
+
+    // Testimonials carousel
+    var _slide = 0;
+    function goSlide(n) {
+      _slide = n;
+      document.getElementById('testiTrack').style.transform = 'translateX(-' + (n*100) + '%)';
+      document.querySelectorAll('.testi-dot').forEach(function(d,i){ d.classList.toggle('active', i===n); });
+    }
+    setInterval(function(){ goSlide((_slide+1)%2); }, 6000);
+
+    // Lightbox
+    var _glbItems = [], _glbIdx = 0;
+    function glbOpen(el, idx) {
+      var imgs = Array.from(document.querySelectorAll('.img-zoom'));
+      _glbItems = imgs.map(function(i){ return { src: i.querySelector('img').src, cap: i.dataset.caption || i.querySelector('img').alt || '' }; });
+      _glbIdx = idx !== undefined ? idx : imgs.indexOf(el);
+      if(_glbIdx < 0) _glbIdx = 0;
+      glbShow();
+    }
+    function glbShow() {
+      var item = _glbItems[_glbIdx];
+      document.getElementById('glb-img').src = item.src;
+      document.getElementById('glb-caption').textContent = item.cap;
+      document.getElementById('glb').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('glb-prev').style.display = _glbItems.length > 1 ? 'flex' : 'none';
+      document.getElementById('glb-next').style.display = _glbItems.length > 1 ? 'flex' : 'none';
+    }
+    function glbNav(dir, e) {
+      if(e) e.stopPropagation();
+      _glbIdx = (_glbIdx + dir + _glbItems.length) % _glbItems.length;
+      glbShow();
+    }
+    function glbClose(e) {
+      if(e && (e.target.id==='glb-prev'||e.target.id==='glb-next'||e.target.id==='glb-wrap'||e.target.id==='glb-img')) return;
+      if(e && e.target.closest && e.target.closest('#glb-wrap') && e.target.tagName!=='DIV') return;
+      document.getElementById('glb').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e){
+      if(!document.getElementById('glb').classList.contains('open')) return;
+      if(e.key==='Escape') glbClose();
+      if(e.key==='ArrowLeft') glbNav(-1);
+      if(e.key==='ArrowRight') glbNav(1);
+    });
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.img-zoom').forEach(function(el, idx){
+        el.addEventListener('click', function(){ glbOpen(el, idx); });
+      });
+    });
+  </script>
+</body>
+</html>

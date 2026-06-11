@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="images/logo.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard – Pragnya Young Orators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ── PASTE YOUR FIREBASE CONFIG HERE ────────────────────────────────────
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYYfCdElATsHkGFDaITk-0n8sgVcCUfdg",
+      authDomain: "pragnya-portal.firebaseapp.com",
+      projectId: "pragnya-portal",
+      storageBucket: "pragnya-portal.firebasestorage.app",
+      messagingSenderId: "523738714900",
+      appId: "1:523738714900:web:7c509827628def79cae801"
+    };
+    // ────────────────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
+
+      const docSnap = await getDoc(doc(db, 'students', user.uid));
+      if (!docSnap.exists()) { window.location.href = 'login.html'; return; }
+      const data = docSnap.data();
+      if (data.role === 'admin') { window.location.href = 'admin-dashboard.html'; return; }
+
+      const name = data.fullName || user.displayName || 'Student';
+      const initial = name.charAt(0).toUpperCase();
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+      // Populate sidebar + header
+      document.querySelectorAll('.js-name').forEach(el => el.textContent = name);
+      document.querySelectorAll('.js-initial').forEach(el => el.textContent = initial);
+      document.getElementById('sidebarProgram').textContent = data.program || 'Pragnya Program';
+      document.getElementById('welcomeGreeting').textContent = greeting + ', ' + name.split(' ')[0] + '!';
+      document.getElementById('profileGrade').textContent = data.grade || '—';
+      document.getElementById('profileProgram').textContent = data.program || '—';
+      document.getElementById('profileEmail').textContent = data.email || user.email;
+      document.getElementById('profileParent').textContent = data.parentName || '—';
+
+      // Stats
+      const p = data.progress || {};
+      const speeches = p.speechesCompleted || 0;
+      const tournaments = p.tournamentsEntered || 0;
+      const hours = p.hoursLogged || 0;
+      const level = p.level || 'Beginner';
+      document.querySelectorAll('.js-speeches').forEach(el => el.textContent = speeches);
+      document.querySelectorAll('.js-tournaments').forEach(el => el.textContent = tournaments);
+      document.querySelectorAll('.js-hours').forEach(el => el.textContent = hours);
+      document.querySelectorAll('.js-level').forEach(el => el.textContent = level);
+
+      // Level badge colour
+      const levelColors = { Beginner: '#3478b4', Intermediate: '#c9a84c', Advanced: '#2d5a3a', Varsity: '#8a4fc7' };
+      document.getElementById('levelBadge').style.background = levelColors[level] || '#3478b4';
+
+      // Progress bars
+      const levelMap = { Beginner: 20, Intermediate: 50, Advanced: 75, Varsity: 100 };
+      document.getElementById('levelBar').style.width = (levelMap[level] || 20) + '%';
+      document.getElementById('speechBar').style.width = Math.min(speeches * 4, 100) + '%';
+      document.getElementById('tournamentBar').style.width = Math.min(tournaments * 10, 100) + '%';
+      document.getElementById('hoursBar').style.width = Math.min(hours * 2, 100) + '%';
+
+      // Session notes
+      try {
+        const sq = query(collection(db, 'sessions'), where('studentId', '==', user.uid), orderBy('date', 'desc'));
+        const ssnap = await getDocs(sq);
+        const sessionList = document.getElementById('sessionList');
+        sessionList.innerHTML = '';
+        if (ssnap.empty) {
+          sessionList.innerHTML = '<div class="empty-state">No session notes yet. Your coach will add them here after each session.</div>';
+        } else {
+          ssnap.forEach(d => {
+            const s = d.data();
+            sessionList.innerHTML += `
+              <div class="session-item">
+                <div class="session-top">
+                  <div class="session-date-badge">
+                    <span class="session-month">${new Date(s.date).toLocaleDateString('en-US',{month:'short'})}</span>
+                    <span class="session-day">${new Date(s.date).getDate()}</span>
+                  </div>
+                  <div class="session-info">
+                    <div class="session-type-row">
+                      <span class="session-type-badge">${s.type||'Practice'}</span>
+                      ${s.rating ? `<span class="session-stars">${'★'.repeat(s.rating)}${'☆'.repeat(5-s.rating)}</span>` : ''}
+                    </div>
+                    <p class="session-note-text">${s.note||'—'}</p>
+                  </div>
+                </div>
+              </div>`;
+          });
+        }
+      } catch(e) {
+        document.getElementById('sessionList').innerHTML = '<div class="empty-state">Could not load session notes.</div>';
+      }
+
+      // Announcements
+      try {
+        const aq = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
+        const asnap = await getDocs(aq);
+        const annList = document.getElementById('announcementList');
+        annList.innerHTML = '';
+        if (asnap.empty) {
+          annList.innerHTML = '<div class="empty-state">No announcements yet.</div>';
+        } else {
+          asnap.forEach(d => {
+            const a = d.data();
+            const time = a.createdAt ? new Date(a.createdAt.toDate()).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+            annList.innerHTML += `
+              <div class="ann-item">
+                <div class="ann-dot"></div>
+                <div>
+                  <div class="ann-title">${a.title}</div>
+                  <div class="ann-body">${a.body}</div>
+                  ${time ? `<div class="ann-time">${time}</div>` : ''}
+                </div>
+              </div>`;
+          });
+        }
+      } catch(e) {}
+
+      document.getElementById('loadingOverlay').style.display = 'none';
+      document.getElementById('appShell').style.display = 'flex';
+    });
+
+    window.doSignOut = async function() {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    };
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest: #2d5a3a; --deep: #1e3a28; --gold: #c9a84c;
+      --cream: #f7f4ee; --white: #fff; --text: #1a2e1f; --muted: #5a7264;
+      --border: #e0dbd0; --sidebar: 230px;
+    }
+    html, body { height: 100%; }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #edeae3; }
+
+    /* LOADING */
+    #loadingOverlay { position: fixed; inset: 0; background: var(--cream); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .spin { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--forest); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* APP SHELL */
+    #appShell { display: none; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar); background: var(--deep); position: fixed; top: 0; left: 0; bottom: 0;
+      display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+      transition: transform .3s ease;
+    }
+    .sb-header { padding: 22px 18px; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .sb-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 18px; }
+    .sb-logo img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+    .sb-logo-text { font-weight: 700; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--white); line-height: 1.3; }
+    .sb-user { display: flex; align-items: center; gap: 10px; }
+    .sb-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: var(--deep); flex-shrink: 0; }
+    .sb-user-name { font-size: .82rem; font-weight: 700; color: var(--white); line-height: 1.2; }
+    .sb-user-prog { font-size: .68rem; color: rgba(255,255,255,.4); margin-top: 1px; }
+    .sb-badge { display: inline-block; font-size: .58rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: rgba(201,168,76,.2); color: var(--gold); padding: 2px 6px; border-radius: 3px; margin-top: 3px; }
+    .sb-nav { padding: 10px 0; flex: 1; }
+    .sb-sec-label { font-size: .62rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.25); padding: 10px 18px 4px; }
+    .sb-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 18px;
+      font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.55);
+      cursor: pointer; transition: all .15s; border: none; background: none;
+      width: 100%; text-align: left; border-left: 3px solid transparent;
+      text-decoration: none;
+    }
+    .sb-item:hover { background: rgba(255,255,255,.05); color: var(--white); }
+    .sb-item.active { background: rgba(201,168,76,.1); color: var(--white); border-left-color: var(--gold); }
+    .sb-item svg { flex-shrink: 0; opacity: .7; }
+    .sb-item.active svg { opacity: 1; }
+    .sb-bottom { padding: 14px 10px; border-top: 1px solid rgba(255,255,255,.07); }
+    .sb-signout {
+      display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 14px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px; color: rgba(255,255,255,.5); font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .sb-signout:hover { background: rgba(192,57,43,.15); border-color: rgba(192,57,43,.25); color: #e88; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar); flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 40; }
+    .topbar-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--deep); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .topbar-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--forest); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem; color: var(--white); }
+    .topbar-name { font-size: .85rem; font-weight: 600; color: var(--deep); }
+    .topbar-role { font-size: .7rem; color: var(--muted); }
+
+    /* PANELS */
+    .content { padding: 28px 32px; flex: 1; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* WELCOME */
+    .welcome-card {
+      background: linear-gradient(130deg, var(--deep) 0%, var(--forest) 100%);
+      border-radius: 10px; padding: 26px 30px; margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      position: relative; overflow: hidden;
+    }
+    .welcome-card::before { content: ''; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(201,168,76,.07); }
+    .welcome-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--white); margin-bottom: 4px; }
+    .welcome-card p { font-size: .82rem; color: rgba(255,255,255,.6); }
+    .level-pill { border-radius: 8px; padding: 10px 20px; text-align: center; flex-shrink: 0; background: rgba(201,168,76,.18); border: 1px solid rgba(201,168,76,.35); }
+    .level-pill-label { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+    .level-pill-val { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--gold); line-height: 1.3; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--white); border-radius: 8px; padding: 18px; border: 1px solid var(--border); }
+    .stat-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .stat-num { font-family: 'DM Serif Display', serif; font-size: 1.9rem; color: var(--deep); line-height: 1; margin-bottom: 2px; }
+    .stat-label { font-size: .72rem; color: var(--muted); font-weight: 500; }
+
+    /* TWO COL */
+    .two-col { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+    .card { background: var(--white); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+    .card-head { padding: 15px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-head h3 { font-size: .88rem; font-weight: 700; color: var(--deep); }
+    .card-tag { font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: rgba(201,168,76,.14); color: #7a5e0a; padding: 3px 8px; border-radius: 4px; }
+    .card-body { padding: 16px 18px; }
+
+    /* SESSIONS */
+    .session-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .session-item:last-child { border-bottom: none; }
+    .session-top { display: flex; gap: 12px; }
+    .session-date-badge { min-width: 42px; background: var(--cream); border-radius: 6px; padding: 6px 4px; text-align: center; flex-shrink: 0; }
+    .session-month { display: block; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gold); }
+    .session-day { display: block; font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--deep); line-height: 1; }
+    .session-type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .session-type-badge { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; background: rgba(45,90,58,.1); color: var(--forest); padding: 2px 7px; border-radius: 4px; }
+    .session-stars { font-size: .85rem; color: var(--gold); letter-spacing: 1px; }
+    .session-note-text { font-size: .82rem; color: var(--text); line-height: 1.55; }
+    .empty-state { font-size: .82rem; color: var(--muted); text-align: center; padding: 20px; font-style: italic; }
+
+    /* ANNOUNCEMENTS */
+    .ann-item { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .ann-item:last-child { border-bottom: none; }
+    .ann-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 5px; }
+    .ann-title { font-size: .84rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .ann-body { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+    .ann-time { font-size: .68rem; color: #aab4ac; margin-top: 3px; }
+
+    /* PROGRESS PANEL */
+    .progress-section-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .skill-item { margin-bottom: 16px; }
+    .skill-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .skill-name { font-size: .82rem; font-weight: 600; color: var(--text); }
+    .skill-pct { font-size: .78rem; font-weight: 700; color: var(--forest); }
+    .skill-bar { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .skill-fill { height: 100%; background: var(--forest); border-radius: 4px; transition: width .8s ease; }
+    .skill-fill.gold { background: var(--gold); }
+
+    .progress-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+    .p-stat { background: var(--white); border-radius: 8px; padding: 20px; border: 1px solid var(--border); text-align: center; }
+    .p-stat-num { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--deep); }
+    .p-stat-label { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+    .level-card { background: linear-gradient(130deg, var(--deep), var(--forest)); border-radius: 8px; padding: 24px; margin-bottom: 20px; }
+    .level-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--white); margin-bottom: 4px; }
+    .level-card p { font-size: .8rem; color: rgba(255,255,255,.6); margin-bottom: 16px; }
+    .level-badge-large {
+      display: inline-block; padding: 6px 20px; border-radius: 20px;
+      font-weight: 700; font-size: .85rem; color: var(--white); letter-spacing: .06em;
+    }
+
+    /* PROFILE PANEL */
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .profile-card { background: var(--white); border-radius: 8px; border: 1px solid var(--border); padding: 22px; }
+    .profile-field { margin-bottom: 14px; }
+    .profile-field:last-child { margin-bottom: 0; }
+    .pf-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 3px; }
+    .pf-val { font-size: .9rem; font-weight: 600; color: var(--deep); }
+
+    /* MOBILE */
+    .mobile-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 54px; background: var(--deep); align-items: center; justify-content: space-between; padding: 0 18px; }
+    .mobile-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .mobile-logo img { width: 30px; height: 30px; border-radius: 50%; }
+    .mobile-logo span { font-weight: 700; font-size: 11px; color: var(--white); letter-spacing: .1em; text-transform: uppercase; }
+    .hamburger { background: none; border: none; cursor: pointer; padding: 6px; display: flex; flex-direction: column; gap: 5px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all .3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99; }
+    .sb-overlay.open { display: block; }
+
+    @media (max-width: 900px) {
+      .mobile-bar { display: flex; }
+      .sidebar { transform: translateX(-100%); box-shadow: 4px 0 24px rgba(0,0,0,.3); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding-top: 54px; }
+      .content { padding: 20px 16px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .progress-stats { grid-template-columns: 1fr 1fr; }
+      .profile-grid { grid-template-columns: 1fr; }
+      .topbar { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loadingOverlay"><div class="spin"></div></div>
+
+  <div id="appShell">
+    <!-- MOBILE BAR -->
+    <div class="mobile-bar">
+      <a class="mobile-logo" href="index.html">
+        <img src="images/logo.png" alt="PYO"/>
+        <span>My Dashboard</span>
+      </a>
+      <button class="hamburger" id="hamburger" onclick="toggleSb()"><span></span><span></span><span></span></button>
+    </div>
+    <div class="sb-overlay" id="sbOverlay" onclick="closeSb()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-header">
+        <a class="sb-logo" href="index.html">
+          <img src="images/logo.png" alt="PYO"/>
+          <span class="sb-logo-text">Pragnya<br>Young Orators</span>
+        </a>
+        <div class="sb-user">
+          <div class="sb-avatar js-initial">S</div>
+          <div>
+            <div class="sb-user-name js-name">Student</div>
+            <div class="sb-user-prog" id="sidebarProgram">Program</div>
+            <span class="sb-badge">Student</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sb-nav">
+        <p class="sb-sec-label">Dashboard</p>
+        <button class="sb-item active" onclick="showPanel('overview', this)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+          Overview
+        </button>
+        <button class="sb-item" onclick="showPanel('progress', this)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-4 3 2 3-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          My Progress
+        </button>
+        <button class="sb-item" onclick="showPanel('sessions', this)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M14 10.67A2 2 0 0112 13H4a2 2 0 01-2-2.33l1-6A2 2 0 014.97 3h6.06A2 2 0 0113 4.67l1 6z" stroke="currentColor" stroke-width="1.5"/></svg>
+          Session Notes
+        </button>
+        <button class="sb-item" onclick="showPanel('announcements', this)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8H2zM2 4l6 5 6-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Announcements
+        </button>
+        <button class="sb-item" onclick="showPanel('profile', this)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14a6 6 0 0112 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          My Profile
+        </button>
+        <p class="sb-sec-label" style="margin-top:12px;">Links</p>
+        <a class="sb-item" href="tournaments.html">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.8 4H14l-3.4 2.5 1.3 4L8 9.5l-3.9 2 1.3-4L2 5h4.2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Tournament Schedule
+        </a>
+        <a class="sb-item" href="programs.html">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 8h6M5 5h3M5 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Programs
+        </a>
+      </nav>
+      <div class="sb-bottom">
+        <button class="sb-signout" onclick="doSignOut()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 12H3a1 1 0 01-1-1V3a1 1 0 011-1h3M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <span class="topbar-title" id="topbarTitle">Overview</span>
+        <div class="topbar-right">
+          <div class="topbar-avatar js-initial">S</div>
+          <div>
+            <div class="topbar-name js-name">Student</div>
+            <div class="topbar-role">Student</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- ═══ OVERVIEW PANEL ═══ -->
+        <div class="panel active" id="panel-overview">
+          <div class="welcome-card">
+            <div>
+              <h2 id="welcomeGreeting">Welcome back!</h2>
+              <p>Here's your activity summary for this season.</p>
+            </div>
+            <div class="level-pill">
+              <div class="level-pill-label">Level</div>
+              <div class="level-pill-val js-level">Beginner</div>
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(45,90,58,.1)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 5h5l-4 2.9 1.5 4.6L8 11 3.5 13.5 5 8.9 1 6h5z" stroke="#2d5a3a" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="stat-num js-speeches">0</div>
+              <div class="stat-label">Speeches Completed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(201,168,76,.12)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="11" rx="2" stroke="#c9a84c" stroke-width="1.4"/><path d="M5 3V1M11 3V1M1 7h14" stroke="#c9a84c" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="stat-num js-tournaments">0</div>
+              <div class="stat-label">Tournaments Entered</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(52,120,180,.1)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#3478b4" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="#3478b4" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="stat-num js-hours">0</div>
+              <div class="stat-label">Practice Hours</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(138,79,199,.1)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 100 10A5 5 0 008 1zM8 4v3l2 2" stroke="#8a4fc7" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="stat-num" style="font-size:1.1rem; padding-top:6px;" id="overviewLevel">—</div>
+              <div class="stat-label">Current Level</div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head"><h3>Recent Session Notes</h3><span class="card-tag">From Your Coach</span></div>
+              <div class="card-body" id="sessionList"><div class="empty-state">Loading…</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="card">
+                <div class="card-head"><h3>Announcements</h3><span class="card-tag">From Coach</span></div>
+                <div class="card-body" id="announcementList"><div class="empty-state">Loading…</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ PROGRESS PANEL ═══ -->
+        <div class="panel" id="panel-progress">
+          <div class="level-card">
+            <h3>Current Level</h3>
+            <p>Your coach updates your level as you advance through the program.</p>
+            <span class="level-badge-large js-level" id="levelBadge" style="background:#3478b4">Beginner</span>
+          </div>
+
+          <div class="progress-stats">
+            <div class="p-stat">
+              <div class="p-stat-num js-speeches">0</div>
+              <div class="p-stat-label">Speeches Completed</div>
+            </div>
+            <div class="p-stat">
+              <div class="p-stat-num js-tournaments">0</div>
+              <div class="p-stat-label">Tournaments Entered</div>
+            </div>
+            <div class="p-stat">
+              <div class="p-stat-num js-hours">0</div>
+              <div class="p-stat-label">Practice Hours</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Progress Tracking</h3></div>
+            <div class="card-body">
+              <p class="progress-section-title">Overall</p>
+              <div class="skill-item">
+                <div class="skill-header"><span class="skill-name">Program Level</span><span class="skill-pct js-level">Beginner</span></div>
+                <div class="skill-bar"><div class="skill-fill" id="levelBar" style="width:20%"></div></div>
+              </div>
+              <p class="progress-section-title" style="margin-top:20px;">Activity</p>
+              <div class="skill-item">
+                <div class="skill-header"><span class="skill-name">Speeches (toward 25)</span><span class="skill-pct js-speeches">0</span></div>
+                <div class="skill-bar"><div class="skill-fill gold" id="speechBar" style="width:0%"></div></div>
+              </div>
+              <div class="skill-item">
+                <div class="skill-header"><span class="skill-name">Tournaments (toward 10)</span><span class="skill-pct js-tournaments">0</span></div>
+                <div class="skill-bar"><div class="skill-fill" id="tournamentBar" style="width:0%"></div></div>
+              </div>
+              <div class="skill-item">
+                <div class="skill-header"><span class="skill-name">Practice Hours (toward 50)</span><span class="skill-pct js-hours">0</span></div>
+                <div class="skill-bar"><div class="skill-fill gold" id="hoursBar" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ SESSION NOTES PANEL ═══ -->
+        <div class="panel" id="panel-sessions">
+          <div class="card">
+            <div class="card-head"><h3>All Session Notes</h3><span class="card-tag">From Your Coach</span></div>
+            <div class="card-body" id="sessionListFull"><div class="empty-state">Loading…</div></div>
+          </div>
+        </div>
+
+        <!-- ═══ ANNOUNCEMENTS PANEL ═══ -->
+        <div class="panel" id="panel-announcements">
+          <div class="card">
+            <div class="card-head"><h3>All Announcements</h3></div>
+            <div class="card-body" id="announcementListFull"><div class="empty-state">Loading…</div></div>
+          </div>
+        </div>
+
+        <!-- ═══ PROFILE PANEL ═══ -->
+        <div class="panel" id="panel-profile">
+          <div class="profile-grid">
+            <div class="profile-card">
+              <h3 style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--deep);margin-bottom:18px;">Student Info</h3>
+              <div class="profile-field"><div class="pf-label">Full Name</div><div class="pf-val js-name">—</div></div>
+              <div class="profile-field"><div class="pf-label">Grade</div><div class="pf-val" id="profileGrade">—</div></div>
+              <div class="profile-field"><div class="pf-label">Program</div><div class="pf-val" id="profileProgram">—</div></div>
+              <div class="profile-field"><div class="pf-label">Email</div><div class="pf-val" id="profileEmail" style="font-size:.82rem;">—</div></div>
+            </div>
+            <div class="profile-card">
+              <h3 style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--deep);margin-bottom:18px;">Parent / Guardian</h3>
+              <div class="profile-field"><div class="pf-label">Parent Name</div><div class="pf-val" id="profileParent">—</div></div>
+              <div style="margin-top:28px; padding-top:18px; border-top:1px solid var(--border);">
+                <p style="font-size:.8rem;color:var(--muted);line-height:1.7;">Need to update your profile details? Contact your coach at <a href="mailto:pragnyaevents@gmail.com" style="color:var(--forest);font-weight:600;">pragnyaevents@gmail.com</a></p>
+              </div>
+              <button onclick="doSignOut()" style="margin-top:16px;width:100%;padding:10px;background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:6px;color:#c0392b;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .15s;">Sign Out</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /appShell -->
+
+  <script>
+    function showPanel(id, navEl) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+      if (navEl) navEl.classList.add('active');
+      const titles = { overview: 'Overview', progress: 'My Progress', sessions: 'Session Notes', announcements: 'Announcements', profile: 'My Profile' };
+      document.getElementById('topbarTitle').textContent = titles[id] || 'Dashboard';
+      // Sync sessions/announcements panels with loaded data
+      if (id === 'sessions') {
+        document.getElementById('sessionListFull').innerHTML = document.getElementById('sessionList').innerHTML;
+      }
+      if (id === 'announcements') {
+        document.getElementById('announcementListFull').innerHTML = document.getElementById('announcementList').innerHTML;
+      }
+      // Update overview level badge
+      document.getElementById('overviewLevel').textContent = document.querySelector('.js-level').textContent;
+      if (window.innerWidth <= 900) closeSb();
+    }
+    function toggleSb() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sbOverlay').classList.toggle('open');
+      document.getElementById('hamburger').classList.toggle('open');
+    }
+    function closeSb() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sbOverlay').classList.remove('open');
+      document.getElementById('hamburger')?.classList.remove('open');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="images/logo.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Pragnya Young Orators Gallery – Photos from practice sessions, tournaments, workshops, and achievements."/>
+  <title>Gallery – Pragnya Young Orators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--forest:#2d5a3a;--deep:#1e3a28;--gold:#c9a84c;--gold-lt:#e0c06a;--cream:#f7f4ee;--white:#ffffff;--text:#1a2e1f;--muted:#5a7264;--border:#e0dbd0;--sidebar-w:230px;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;color:var(--text);background:var(--white);display:flex;}
+    .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--cream);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:200;padding:28px 0 20px;overflow-y:auto;transition:transform .3s ease;}
+    .sidebar-logo{padding:0 24px 24px;border-bottom:1px solid var(--border);}
+    .logo-mark{width:54px;height:54px;border-radius:50%;overflow:hidden;margin-bottom:10px;display:block;}
+    .logo-mark img{width:54px;height:54px;border-radius:50%;object-fit:cover;display:block;}
+    .logo-name{font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--deep);line-height:1.3;}
+    .logo-tagline{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+    .sidebar nav{padding:12px 0;flex:1;}
+    .nav-group{display:block;}
+    .nav-item{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:inherit;}
+    .nav-item:hover{background:#ede9e0;color:var(--forest);}
+    .nav-item.active{background:#ede9e0;color:var(--forest);border-left:3px solid var(--gold);padding-left:21px;}
+    .nav-label{text-decoration:none;color:inherit;flex:1;pointer-events:auto;}
+    .nav-arrow{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;flex-shrink:0;transition:transform .25s ease;color:var(--muted);}
+    .nav-toggle.open .nav-arrow{transform:rotate(90deg);}
+    .nav-sub{max-height:0;overflow:hidden;transition:max-height .3s ease;background:rgba(30,58,40,.04);}
+    .nav-sub.open{max-height:200px;}
+    .nav-sub a{display:block;padding:7px 24px 7px 38px;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s,background .15s;}
+    .nav-sub a:hover{color:var(--forest);background:#ede9e0;}
+    .sidebar-ctas{padding:16px 20px 0;display:flex;flex-direction:column;gap:10px;}
+    .btn-primary{display:block;text-align:center;background:var(--gold);color:var(--deep);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:12px 16px;border-radius:4px;text-decoration:none;}
+    .btn-primary:hover{background:var(--gold-lt);}
+    .btn-outline{display:block;text-align:center;border:1.5px solid var(--text);color:var(--text);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 16px;border-radius:4px;text-decoration:none;}
+    .btn-outline:hover{border-color:var(--forest);color:var(--forest);}
+    .sidebar-footer{padding:20px 24px 0;border-top:1px solid var(--border);margin-top:auto;}
+    .sidebar-footer a{display:block;font-size:12px;color:var(--muted);text-decoration:none;line-height:2.1;}
+    .sidebar-footer a:hover{color:var(--forest);}
+    .sidebar-footer .footer-note{font-size:11px;color:var(--muted);margin-top:4px;}
+    .mobile-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:300;height:56px;background:var(--deep);align-items:center;justify-content:space-between;padding:0 20px;}
+    .mobile-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .mobile-logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
+    .mobile-logo-name{font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;line-height:1.3;}
+    .hamburger{background:none;border:none;cursor:pointer;padding:6px;display:flex;flex-direction:column;gap:5px;}
+    .hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .3s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;}
+    .sidebar-overlay.open{display:block;}
+    main{margin-left:var(--sidebar-w);flex:1;}
+    .page-hero{background:var(--deep);padding:72px 56px 64px;position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:340px;height:340px;border-radius:50%;background:rgba(201,168,76,.07);}
+    .page-hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .page-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3rem);color:#fff;line-height:1.15;max-width:600px;}
+    .page-hero p{font-size:.97rem;color:rgba(255,255,255,.72);margin-top:14px;max-width:520px;line-height:1.7;}
+    .stats-strip{background:var(--forest);padding:36px 56px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;}
+    .stat-num{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--gold);line-height:1;}
+    .stat-label{font-size:.75rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:6px;}
+    .gallery-section{padding:56px 56px 80px;}
+    .filter-bar{display:flex;gap:8px;margin-bottom:40px;flex-wrap:wrap;}
+    .filter-btn{padding:7px 18px;border-radius:20px;font-size:.8rem;font-weight:600;border:1.5px solid var(--border);background:var(--white);color:var(--text);cursor:pointer;transition:all .15s;}
+    .filter-btn.active,.filter-btn:hover{background:var(--forest);color:#fff;border-color:var(--forest);}
+    .gallery-grid{columns:4;column-gap:12px;}
+    .gallery-item{break-inside:avoid;margin-bottom:12px;position:relative;overflow:hidden;border-radius:4px;cursor:pointer;display:block;}
+    .gallery-item img{width:100%;display:block;transition:transform .4s ease;}
+    .gallery-item:hover img{transform:scale(1.05);}
+    .gallery-overlay{position:absolute;inset:0;background:rgba(30,58,40,0);transition:background .3s;display:flex;align-items:flex-end;}
+    .gallery-item:hover .gallery-overlay{background:rgba(30,58,40,.6);}
+    .gallery-caption{padding:14px;color:#fff;transform:translateY(8px);opacity:0;transition:all .3s;}
+    .gallery-item:hover .gallery-caption{transform:translateY(0);opacity:1;}
+    .gallery-caption-tag{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
+    .gallery-caption-title{font-weight:600;font-size:.82rem;line-height:1.35;}
+    .img-zoom{overflow:hidden;border-radius:4px;cursor:zoom-in;display:block;position:relative;}
+    .img-zoom img{transition:transform .4s ease,filter .4s ease;display:block;width:100%;}
+    .img-zoom:hover img{transform:scale(1.06);filter:brightness(1.05);}
+    .img-zoom::after{content:'';position:absolute;inset:0;background:rgba(30,58,40,0);transition:background .3s;border-radius:4px;pointer-events:none;}
+    .img-zoom:hover::after{background:rgba(30,58,40,.12);}
+    .img-zoom::before{content:'';position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.0) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.35-4.35M11 8v6M8 11h6'/%3E%3C/svg%3E") center/16px no-repeat;opacity:0;transform:scale(.7);transition:opacity .25s,transform .25s,background .25s;}
+    .img-zoom:hover::before{opacity:1;transform:scale(1);background-color:rgba(30,58,40,.65);}
+    #glb{display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,20,14,.94);align-items:center;justify-content:center;padding:20px;cursor:zoom-out;}
+    #glb.open{display:flex;}
+    #glb-wrap{position:relative;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;}
+    #glb img{max-width:90vw;max-height:85vh;border-radius:6px;object-fit:contain;display:block;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:glbIn .22s ease;}
+    @keyframes glbIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+    #glb-caption{color:rgba(255,255,255,.65);font-size:.82rem;margin-top:12px;font-family:'Inter',sans-serif;text-align:center;letter-spacing:.04em;}
+    #glb-close{position:fixed;top:18px;right:22px;color:white;font-size:2rem;cursor:pointer;background:none;border:none;opacity:.7;transition:opacity .2s;line-height:1;z-index:10000;}
+    #glb-close:hover{opacity:1;}
+    #glb-prev,#glb-next{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);color:white;border:none;font-size:1.6rem;width:44px;height:44px;border-radius:50%;cursor:pointer;transition:background .2s;z-index:10000;display:flex;align-items:center;justify-content:center;}
+    #glb-prev{left:16px;} #glb-next{right:16px;}
+    #glb-prev:hover,#glb-next:hover{background:rgba(255,255,255,.25);}
+    .cta-band{background:var(--gold);padding:60px 56px;display:flex;align-items:center;justify-content:space-between;gap:32px;}
+    .cta-band h2{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--deep);}
+    .cta-band p{font-size:.93rem;color:rgba(30,58,40,.72);margin-top:6px;}
+    .cta-btns{display:flex;gap:14px;flex-shrink:0;}
+    .cta-btn-dark{background:var(--deep);color:#fff;padding:14px 28px;border-radius:4px;font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;}
+    .cta-btn-dark:hover{background:var(--forest);}
+    .cta-btn-light{background:transparent;color:var(--deep);padding:13px 28px;border-radius:4px;font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:2px solid var(--deep);}
+    footer{background:var(--deep);color:rgba(255,255,255,.55);padding:48px 56px 32px;}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:36px;}
+    .footer-brand-col .footer-brand{font-family:'DM Serif Display',serif;font-size:1.2rem;color:#fff;display:block;margin-bottom:10px;}
+    .footer-brand-col p{font-size:.82rem;line-height:1.7;color:rgba(255,255,255,.5);max-width:240px;margin-bottom:16px;}
+    .footer-social{display:flex;gap:10px;}
+    .footer-social a{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);text-decoration:none;transition:background .2s;}
+    .footer-social a:hover{background:var(--gold);color:var(--deep);}
+    .footer-col h4{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+    .footer-col a{display:block;font-size:.82rem;color:rgba(255,255,255,.5);text-decoration:none;line-height:2.2;}
+    .footer-col a:hover{color:#fff;}
+    .footer-col p{font-size:.82rem;color:rgba(255,255,255,.5);line-height:2.0;}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;}
+    .footer-bottom a{color:var(--gold);text-decoration:none;}
+    .footer-quote{font-style:italic;color:rgba(255,255,255,.4);}
+    @media(max-width:1100px){.gallery-grid{columns:3;}}
+    @media(max-width:900px){
+      .mobile-bar{display:flex;} .sidebar{transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,.2);}
+      .sidebar.open{transform:translateX(0);} main{margin-left:0!important;padding-top:56px;}
+      .gallery-grid{columns:2;} .stats-strip{grid-template-columns:repeat(2,1fr);}
+      .cta-band{flex-direction:column;text-align:center;} .gallery-section{padding:40px 20px 60px;}
+      .footer-grid{grid-template-columns:1fr 1fr;} .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+    }
+    @media(max-width:500px){.gallery-grid{columns:1;}}
+  </style>
+</head>
+<body>
+  <div class="mobile-bar">
+    <a class="mobile-logo" href="index.html"><img src="images/logo.png" alt="Pragnya Young Orators"/><span class="mobile-logo-name">Pragnya<br>Young Orators</span></a>
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  </div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><img src="images/logo.png" alt="Pragnya Young Orators logo"/></div>
+      <div class="logo-name">Pragnya<br>Young Orators</div>
+      <div class="logo-tagline">Find Your Voice</div>
+    </div>
+    <nav>
+      <a class="nav-item" href="index.html">Home</a>
+      <a class="nav-item" href="about.html">About Us</a>
+      <a class="nav-item" href="programs.html">Programs</a>
+      <a class="nav-item" href="tournaments.html">Tournaments</a>
+      <div class="nav-group">
+        <button class="nav-item nav-toggle active" onclick="navToggle(this)">
+          <a class="nav-label" href="gallery.html">Gallery</a>
+          <span class="nav-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 3l4 3-4 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+        <div class="nav-sub open"><a href="gallery.html">All Photos</a><a href="gallery.html#achievements">Achievements</a><a href="gallery.html#speech">Speech</a><a href="gallery.html#camp">Camp</a></div>
+      </div>
+      <a class="nav-item" href="join.html">Join Us</a>
+    </nav>
+    <div class="sidebar-ctas">
+      <a class="btn-primary" href="join.html">Join Us &rsaquo;</a>
+      <a class="btn-outline" href="programs.html">View Programs &rsaquo;</a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="mailto:pragnyaevents@gmail.com">pragnyaevents@gmail.com</a>
+      <div class="footer-note">Est. 2020 &middot; San Diego, CA</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <main>
+    <section class="page-hero">
+      <p class="page-hero-eyebrow">Photo Gallery</p>
+      <h1>Memories, achievements<br>&amp; highlights</h1>
+      <p>A look at our students in action — from practice sessions and debate rounds to tournament moments, workshops, and award ceremonies.</p>
+    </section>
+
+    <section class="stats-strip">
+      <div><div class="stat-num">30</div><div class="stat-label">Photos</div></div>
+      <div><div class="stat-num">15</div><div class="stat-label">Achievement Shots</div></div>
+      <div><div class="stat-num">9</div><div class="stat-label">Speech Competition</div></div>
+      <div><div class="stat-num">6</div><div class="stat-label">Camp Memories</div></div>
+    </section>
+
+    <section class="gallery-section">
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterGallery('all',this)">All (30)</button>
+        <button class="filter-btn" onclick="filterGallery('achievement',this)">Achievements (15)</button>
+        <button class="filter-btn" onclick="filterGallery('speech',this)">Speech (9)</button>
+        <button class="filter-btn" onclick="filterGallery('camp',this)">Camp (6)</button>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- ACHIEVEMENTS (15) -->
+        <div class="gallery-item" data-cat="achievement" id="achievements" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA National Championship"><img src="Achievements/asdancmay2026.jpeg" alt="ASDA National Championship" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">ASDA National Championship</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Season Speech Tournaments"><img src="Achievements/medals-orators.jpeg" alt="Season Speech Tournaments" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">2025–2026 Season Tournaments</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA San Diego Qualifier"><img src="Achievements/asda-sandiego.jpeg" alt="ASDA San Diego Qualifier" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">ASDA San Diego Qualifier</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA April Online Qualifier"><img src="Achievements/asda-aprilolt.jpeg" alt="ASDA April Online Qualifier" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">ASDA April Online Qualifier</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="CHSSA Middle School State Championship"><img src="Achievements/chssa-middleschool.jpeg" alt="CHSSA Middle School State" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">CHSSA Middle School State</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="North America International Speech Contest"><img src="Achievements/na-international-sc.jpeg" alt="NA International Speech Contest" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">NA International Speech Contest</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Rotary Speech Contest"><img src="Achievements/rotary-speech-contest.jpeg" alt="Rotary Speech Contest" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">Rotary Speech Contest</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Pragnya Speech Team Season Dashboard"><img src="Achievements/pragnya-speechteam.jpeg" alt="Pragnya Speech Team Dashboard" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">Pragnya Speech Team Dashboard</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Speech Competition Medals"><img src="Achievements/ba9dde088_IMG_7704.jpeg" alt="Speech Competition Medals" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">Competition Medals</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA Certificate of Achievement"><img src="Achievements/49b68f74b_IMG_7705.jpeg" alt="ASDA Certificate" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">ASDA Certificate of Achievement</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA Trophy"><img src="Achievements/847a4e38f_IMG_7706.jpeg" alt="ASDA Trophy" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">ASDA Trophy</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Optimist Club Certificate"><img src="Achievements/a3873db6e_e0f8b754-1c0b-4ca0-8419-5c3b6a1e2fda.jpeg" alt="Optimist Club Certificate" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">Optimist Club Certificate</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="1st Place Impromptu Speaking"><img src="Achievements/74ff21f6b_73c9fefa-c266-4063-bb1f-a86a635211bc.jpeg" alt="1st Place Impromptu Speaking" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">1st Place Impromptu Speaking</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="National Certificate"><img src="Achievements/6e9f59862_09b09b65-244d-43ab-b4a2-e2cf5e72cfa9.jpeg" alt="National Certificate" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">National Certificate</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="achievement" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Student Award Recognition"><img src="Achievements/56421a1b0_86beca1c-df23-4aaa-9a0d-72c0b0a04110.jpeg" alt="Student Award Recognition" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Achievements</p><p class="gallery-caption-title">Student Award Recognition</p></div></div>
+        </div>
+        <!-- CAMP (6) -->
+        <div class="gallery-item" data-cat="camp" id="camp" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Team at Tournament"><img src="Camp/25191738a_ff6dba84-4a6f-4a0f-87f6-933ee00c4bae6.jpeg" alt="Team at Tournament" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Camp Memories</p><p class="gallery-caption-title">Team at Tournament</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="camp" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Rotary Club of Rancho Bernardo Sunrise"><img src="Camp/acd8bd1a2_2c9e28c8-1f19-4051-bd97-e25157b723a6.jpeg" alt="Rotary Club of Rancho Bernardo" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Camp Memories</p><p class="gallery-caption-title">Rotary Club of Rancho Bernardo</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="camp" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Students relaxing at tournament"><img src="Camp/7bc5f1c8a_CB51B011-B079-4F28-A56A-D6ACD34E952C.jpeg" alt="Tournament Team Huddle" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Camp Memories</p><p class="gallery-caption-title">Tournament Team Huddle</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="camp" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Church competition group photo"><img src="Camp/ef704bf3f_19001fda-e633-45b5-85dd-154517aab39d.jpeg" alt="Competition Group Photo" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Camp Memories</p><p class="gallery-caption-title">Competition Group Photo</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="camp" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Award ceremony group"><img src="Camp/bfaf2a7b7_F7B4AE58-C143-41EE-8B04-E22F036435C2.jpeg" alt="Award Ceremony" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Camp Memories</p><p class="gallery-caption-title">Award Ceremony</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="camp" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Students outside debate venue"><img src="Camp/e4e9f6f71_3a07ab72-7093-4a9b-aff3-b47791776ea1.jpeg" alt="Students Outside Venue" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Camp Memories</p><p class="gallery-caption-title">Students Outside Venue</p></div></div>
+        </div>
+        <!-- SPEECH (9) -->
+        <div class="gallery-item" data-cat="speech" id="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA Competition"><img src="Speech/e56c6c80e_bad4882c-d29f-461e-8e68-8a58dfc16501.jpeg" alt="ASDA Competition" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">ASDA Competition</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA Nationals"><img src="Speech/61b9698b6_bad4882c-d29f-461e-8e68-8a58dfc16501.jpeg" alt="ASDA Nationals" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">ASDA Nationals</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA Qualifiers"><img src="Speech/9841a41de_bad4882c-d29f-461e-8e68-8a58dfc16501.jpeg" alt="ASDA Qualifiers" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">ASDA Qualifiers</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Rotary Competition"><img src="Speech/8c0639d1d_270be627-cc6f-4d74-b030-af556b6b3900.jpeg" alt="Rotary Competition" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">Rotary Competition</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Rotary Club"><img src="Speech/1bada9565_bad4882c-d29f-461e-8e68-8a58dfc16501.jpeg" alt="Rotary Club" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">Rotary Club Event</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="NMA Contestant"><img src="Speech/5027b2211_a9a9196a-5d8d-47a6-8787-fc86abec85be.jpeg" alt="NMA Contestant" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">NMA Contestant</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Optimist International"><img src="Speech/1e7c8d444_0cd1aedb-d3bd-4ff7-80d6-2dd9902e5d9.jpeg" alt="Optimist International" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">Optimist International</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="ASDA Team Photo"><img src="Speech/c37182745_bad4882c-d29f-461e-8e68-8a58dfc16501.jpeg" alt="ASDA Team Photo" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">ASDA Team Photo</p></div></div>
+        </div>
+        <div class="gallery-item" data-cat="speech" onclick="openLightbox(this)">
+          <span class="img-zoom" data-caption="Rotary Club Presentation"><img src="Speech/3239911c9_77115EA0-8EF2-47E6-ADEB-B6DEC0FC5DD0.jpeg" alt="Rotary Club Presentation" loading="lazy"/></span>
+          <div class="gallery-overlay"><div class="gallery-caption"><p class="gallery-caption-tag">Speech Competitions</p><p class="gallery-caption-title">Rotary Club Presentation</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div>
+        <h2>Be part of our next chapter</h2>
+        <p>Join Pragnya and create memories that will last a lifetime.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn-dark" href="join.html">Join Us</a>
+        <a class="cta-btn-light" href="about.html">Learn More</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <span class="footer-brand">Pragnya Young Orators</span>
+          <p>Helping students discover confidence, leadership, and their voice. Est. 2020 &middot; San Diego, CA</p>
+          <div class="footer-social">
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Quick Links</h4><a href="index.html">Home</a><a href="programs.html">Programs</a><a href="tournaments.html">Tournaments</a><a href="join.html">Join Us</a></div>
+        <div class="footer-col"><h4>Explore</h4><a href="about.html">About Us</a><a href="gallery.html">Gallery</a><a href="tournaments.html#results">Results</a></div>
+        <div class="footer-col"><h4>Contact</h4><a href="mailto:pragnyaevents@gmail.com">pragnyaevents@gmail.com</a><p>(619) 555-0190</p><p>San Diego, CA</p></div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Pragnya Young Orators</span>
+        <span class="footer-quote">Helping students discover confidence, leadership, and their voice.</span>
+        <a href="login.html">Portal Login</a>
+      </div>
+    </footer>
+  </main>
+
+  <div id="glb" onclick="glbClose(event)">
+    <button id="glb-close" onclick="glbClose()">&times;</button>
+    <button id="glb-prev" onclick="glbNav(-1,event)">&#8249;</button>
+    <button id="glb-next" onclick="glbNav(1,event)">&#8250;</button>
+    <div id="glb-wrap"><img id="glb-img" src="" alt=""/><p id="glb-caption"></p></div>
+  </div>
+
+  <script>
+    var _glbItems=[],_glbIdx=0;
+    function openLightbox(item) {
+      var imgZoom = item.querySelector('.img-zoom');
+      if(imgZoom) glbOpen(imgZoom);
+    }
+    function glbOpen(el,idx){
+      var imgs=Array.from(document.querySelectorAll('.gallery-item:not([style*="none"]) .img-zoom'));
+      _glbItems=imgs.map(function(i){return{src:i.querySelector('img').src,cap:i.dataset.caption||i.querySelector('img').alt||''};});
+      _glbIdx=idx!==undefined?idx:imgs.indexOf(el);
+      if(_glbIdx<0)_glbIdx=0;
+      glbShow();
+    }
+    function glbShow(){
+      var item=_glbItems[_glbIdx];
+      document.getElementById('glb-img').src=item.src;
+      document.getElementById('glb-caption').textContent=item.cap;
+      document.getElementById('glb').classList.add('open');
+      document.body.style.overflow='hidden';
+      document.getElementById('glb-prev').style.display=_glbItems.length>1?'flex':'none';
+      document.getElementById('glb-next').style.display=_glbItems.length>1?'flex':'none';
+    }
+    function glbNav(dir,e){if(e)e.stopPropagation();_glbIdx=(_glbIdx+dir+_glbItems.length)%_glbItems.length;glbShow();}
+    function glbClose(e){
+      if(e&&(e.target.id==='glb-prev'||e.target.id==='glb-next'||e.target.id==='glb-wrap'||e.target.id==='glb-img'))return;
+      if(e&&e.target.closest&&e.target.closest('#glb-wrap')&&e.target.tagName!=='DIV')return;
+      document.getElementById('glb').classList.remove('open');
+      document.body.style.overflow='';
+    }
+    document.addEventListener('keydown',function(e){
+      if(!document.getElementById('glb').classList.contains('open'))return;
+      if(e.key==='Escape')glbClose();
+      if(e.key==='ArrowLeft')glbNav(-1);
+      if(e.key==='ArrowRight')glbNav(1);
+    });
+    function filterGallery(cat,btn){
+      document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      document.querySelectorAll('.gallery-item').forEach(function(item){
+        item.style.display=(cat==='all'||item.dataset.cat===cat)?'block':'none';
+      });
+    }
+    function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
+    function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');var h=document.getElementById('hamburger');if(h)h.classList.remove('open');}
+    function navToggle(btn){btn.classList.toggle('open');var sub=btn.nextElementSibling;if(sub&&sub.classList.contains('nav-sub'))sub.classList.toggle('open');}
+    document.querySelectorAll('.nav-sub a, a.nav-item').forEach(function(a){a.addEventListener('click',function(){if(window.innerWidth<=900)closeSidebar();});});
+  </script>
+</body>
+</html>

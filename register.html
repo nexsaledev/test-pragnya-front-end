@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="images/logo.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register – Pragnya Young Orators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ── PASTE YOUR FIREBASE CONFIG HERE ────────────────────────────────────
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYYfCdElATsHkGFDaITk-0n8sgVcCUfdg",
+      authDomain: "pragnya-portal.firebaseapp.com",
+      projectId: "pragnya-portal",
+      storageBucket: "pragnya-portal.firebasestorage.app",
+      messagingSenderId: "523738714900",
+      appId: "1:523738714900:web:7c509827628def79cae801"
+    };
+    // ────────────────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.handleRegister = async function() {
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPwd = document.getElementById('confirmPassword').value;
+      const grade = document.getElementById('grade').value;
+      const program = document.getElementById('program').value;
+      const parentName = document.getElementById('parentName').value.trim();
+      const parentEmail = document.getElementById('parentEmail').value.trim();
+      const errorEl = document.getElementById('errorMsg');
+      const btn = document.getElementById('registerBtn');
+
+      errorEl.style.display = 'none';
+
+      if (!fullName || !email || !password || !grade || !program || !parentName) {
+        errorEl.textContent = 'Please fill in all required fields.';
+        errorEl.style.display = 'block'; return;
+      }
+      if (password !== confirmPwd) {
+        errorEl.textContent = 'Passwords do not match.';
+        errorEl.style.display = 'block'; return;
+      }
+      if (password.length < 6) {
+        errorEl.textContent = 'Password must be at least 6 characters.';
+        errorEl.style.display = 'block'; return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating account…';
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: fullName });
+
+        await setDoc(doc(db, 'students', cred.user.uid), {
+          fullName,
+          email,
+          grade,
+          program,
+          parentName,
+          parentEmail: parentEmail || '',
+          role: 'student',
+          enrolledAt: serverTimestamp(),
+          progress: {
+            speechesCompleted: 0,
+            tournamentsEntered: 0,
+            hoursLogged: 0,
+            level: 'Beginner'
+          }
+        });
+
+        // Show success
+        document.getElementById('regForm').style.display = 'none';
+        document.getElementById('successView').style.display = 'block';
+        document.getElementById('successName').textContent = fullName.split(' ')[0];
+
+      } catch(err) {
+        btn.disabled = false;
+        btn.innerHTML = 'Create Account';
+        const msgs = {
+          'auth/email-already-in-use': 'An account with this email already exists. Try logging in.',
+          'auth/invalid-email': 'Please enter a valid email address.',
+          'auth/weak-password': 'Password is too weak. Use at least 6 characters.'
+        };
+        errorEl.textContent = msgs[err.code] || 'Registration failed. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    };
+
+    window.togglePwd = function(id, btn) {
+      const inp = document.getElementById(id);
+      const isText = inp.type === 'text';
+      inp.type = isText ? 'password' : 'text';
+      btn.innerHTML = isText
+        ? `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5S1 8 1 8z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>`
+        : `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 1l14 14M6.5 6.7A2 2 0 009.3 9.5M3.5 3.7C2.3 4.7 1.4 6 1 8c1.1 4 7 5.5 10.5 3.5M7 3.1C7.3 3 7.7 3 8 3c4.5 0 7 5 7 5a12 12 0 01-2 2.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    };
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest: #2d5a3a; --deep: #1e3a28; --gold: #c9a84c;
+      --cream: #f7f4ee; --white: #fff; --text: #1a2e1f; --muted: #5a7264;
+      --border: #e0dbd0; --red: #c0392b;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; background: var(--cream); }
+
+    /* TOP BAR */
+    .top-bar { background: var(--deep); height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+    .top-bar-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .top-bar-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .top-bar-name { font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--white); line-height: 1.3; }
+    .top-bar-back { font-size: .8rem; color: rgba(255,255,255,.55); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .top-bar-back:hover { color: var(--white); }
+
+    /* PAGE */
+    .page { max-width: 600px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* HEADER */
+    .page-header { text-align: center; margin-bottom: 36px; }
+    .page-header .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--deep); margin-bottom: 8px; }
+    .page-header p { font-size: .88rem; color: var(--muted); line-height: 1.7; }
+
+    /* CARD */
+    .reg-card { background: var(--white); border-radius: 12px; padding: 40px; box-shadow: 0 4px 32px rgba(30,58,40,.08); }
+
+    /* SECTION LABEL */
+    .section-label { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 24px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .section-label:first-child { margin-top: 0; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: .75rem; font-weight: 700; color: var(--deep); margin-bottom: 6px; letter-spacing: .04em; text-transform: uppercase; }
+    .form-label span { color: var(--red); }
+    .input-wrap { position: relative; }
+    .form-input, .form-select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 7px; font-size: .88rem; font-family: 'Inter', sans-serif; color: var(--text); background: #fbfaf8; transition: border-color .15s; outline: none; }
+    .form-input:focus, .form-select:focus { border-color: var(--forest); background: var(--white); }
+    .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a7264' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .pwd-toggle { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; }
+    .pwd-toggle:hover { color: var(--forest); }
+    .field-hint { font-size: .73rem; color: var(--muted); margin-top: 4px; }
+
+    .error-msg { background: rgba(192,57,43,.07); border: 1px solid rgba(192,57,43,.22); border-radius: 7px; padding: 10px 14px; font-size: .82rem; color: var(--red); margin-bottom: 16px; display: none; }
+
+    .register-btn { width: 100%; padding: 14px; background: var(--forest); color: var(--white); border: none; border-radius: 7px; font-weight: 700; font-size: .9rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: background .2s; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
+    .register-btn:hover { background: var(--deep); }
+    .register-btn:disabled { opacity: .65; cursor: not-allowed; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .login-link { text-align: center; margin-top: 20px; font-size: .82rem; color: var(--muted); }
+    .login-link a { color: var(--forest); font-weight: 700; text-decoration: none; }
+    .login-link a:hover { color: var(--gold); }
+
+    /* SUCCESS */
+    #successView { display: none; text-align: center; padding: 20px 0; }
+    .success-icon { width: 64px; height: 64px; background: rgba(45,90,58,.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    #successView h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; color: var(--deep); margin-bottom: 10px; }
+    #successView p { font-size: .9rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; max-width: 360px; margin-left: auto; margin-right: auto; }
+    .go-login-btn { display: inline-block; background: var(--forest); color: var(--white); padding: 13px 32px; border-radius: 7px; font-weight: 700; font-size: .88rem; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; transition: background .2s; }
+    .go-login-btn:hover { background: var(--deep); }
+
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .reg-card { padding: 28px 20px; } }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="top-bar-logo" href="index.html">
+      <img src="images/logo.png" alt="Pragnya Young Orators"/>
+      <span class="top-bar-name">Pragnya<br>Young Orators</span>
+    </a>
+    <a class="top-bar-back" href="login.html">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Login
+    </a>
+  </div>
+
+  <div class="page">
+    <div class="page-header">
+      <p class="eyebrow">Student Portal</p>
+      <h1>Create Your Account</h1>
+      <p>Register to access your student dashboard, track your progress, and stay connected with your coaches.</p>
+    </div>
+
+    <div class="reg-card">
+      <div id="regForm">
+        <div class="error-msg" id="errorMsg"></div>
+
+        <!-- STUDENT INFO -->
+        <p class="section-label">Student Information</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name <span>*</span></label>
+            <input class="form-input" type="text" id="fullName" placeholder="Student's full name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Grade <span>*</span></label>
+            <select class="form-select" id="grade">
+              <option value="">Select grade</option>
+              <option>Grade 5</option><option>Grade 6</option><option>Grade 7</option>
+              <option>Grade 8</option><option>Grade 9</option><option>Grade 10</option>
+              <option>Grade 11</option><option>Grade 12</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Program <span>*</span></label>
+          <select class="form-select" id="program">
+            <option value="">Select a program</option>
+            <option>Beginners Program</option>
+            <option>Junior Varsity Program</option>
+            <option>Varsity Program</option>
+          </select>
+        </div>
+
+        <!-- PARENT INFO -->
+        <p class="section-label">Parent / Guardian Information</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Parent Name <span>*</span></label>
+            <input class="form-input" type="text" id="parentName" placeholder="Parent's full name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Parent Email</label>
+            <input class="form-input" type="email" id="parentEmail" placeholder="parent@email.com"/>
+          </div>
+        </div>
+
+        <!-- ACCOUNT -->
+        <p class="section-label">Account Credentials</p>
+        <div class="form-group">
+          <label class="form-label">Email Address <span>*</span></label>
+          <input class="form-input" type="email" id="email" placeholder="student@email.com"/>
+          <p class="field-hint">This is the email you'll use to log in.</p>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Password <span>*</span></label>
+            <div class="input-wrap">
+              <input class="form-input" type="password" id="password" placeholder="Min. 6 characters"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('password', this)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5S1 8 1 8z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password <span>*</span></label>
+            <div class="input-wrap">
+              <input class="form-input" type="password" id="confirmPassword" placeholder="Repeat password"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('confirmPassword', this)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7-5 7 5-2.5 5-7 5S1 8 1 8z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="register-btn" id="registerBtn" onclick="handleRegister()">Create Account</button>
+      </div>
+
+      <!-- SUCCESS -->
+      <div id="successView">
+        <div class="success-icon">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M7 15l5 5 11-11" stroke="#2d5a3a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2>Welcome to Pragnya!</h2>
+        <p>Your account has been created, <strong id="successName"></strong>! You can now sign in to your student dashboard.</p>
+        <a class="go-login-btn" href="login.html">Go to Login →</a>
+      </div>
+    </div>
+
+    <div class="login-link">Already have an account? <a href="login.html">Sign in here</a></div>
+  </div>
+</body>
+</html>
